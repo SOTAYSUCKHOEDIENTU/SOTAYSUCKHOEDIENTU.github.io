@@ -1,7 +1,7 @@
 // 1. CẤU HÌNH KẾT NỐI ĐÁM MÂY SUPABASE
 const SUPABASE_URL = "https://dimfsbnaopsipujmivhs.supabase.co";
 // Bạn hãy xóa chữ tiếng Việt bên dưới và dán mã sb_publishable_SpJ... bạn vừa copy ở Bước 1 vào giữa hai dấu nháy:
-const SUPABASE_KEY = "DÁN_MÃ_ANON_PUBLIC_KEY_CỦA_BẠN_VÀO_ĐÂY"; 
+const SUPABASE_KEY = "sb_publishable_SpJ-bY2WXZpInsMN7xeAfQ__jWxSn_y"; 
 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let myModal;
