@@ -622,21 +622,6 @@
                 if (parsed.doiTuong || parsed.khamDotXuat) {
                     dataDoiTuong = parsed.doiTuong || [];
                     dataKham = parsed.khamDotXuat || [];
-                    saveToStorage();
-                    updateStats();
-                    renderTable();
-                    renderKhamTable();
-                    populateDoiTuongSelect();
-                    alert("Nhập dữ liệu thành công!");
-                } else {
-                    alert("Cấu trúc file không đúng chuẩn.");
-                }
-            } catch (err) {
-                alert("Lỗi đọc file: Định dạng JSON không hợp lệ.");
-            }
-        };
-        reader.readAsText(file);
-    }
 <script src="https://jsdelivr.net"></script>
 <script src="app.js"></script>
 </body>
