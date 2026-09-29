@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý đối tượng - Trung tâm BTXH Tân Hiệp</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .card-stat { transition: transform 0.2s; border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .card-stat:hover { transform: translateY(-5px); }
+        .table-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .avatar-preview { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; border: 2px dashed #ddd; }
+        .avatar-table { width: 50px; height: 50px; object-fit: cover; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container py-4">
+    <h1 class="text-center mb-4 text-primary fw-bold">🏠 QUẢN LÝ ĐỐI TƯỢNG - TRUNG TÂM BTXH TÂN HIỆP</h1>
+    <p class="text-center text-muted">Quản lý hồ sơ, vị trí hiện tại, thuốc theo dõi và khám đột xuất.</p>
+
+    <!-- Thao tác nhanh -->
+    <div class="d-flex justify-content-between align-items-center mb-4 bg-white p-3 rounded shadow-sm">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalDoiTuong" onclick="resetForm()">
+            <i class="bi bi-plus-circle"></i> Thêm đối tượng
+        </button>
+        <div>
+            <button class="btn btn-outline-success me-2" onclick="exportData()"><i class="bi bi-download"></i> Xuất dữ liệu</button>
+            <button class="btn btn-outline-secondary" onclick="triggerImport()"><i class="bi bi-upload"></i> Nhập dữ liệu</button>
+            <input type="file" id="importFile" class="d-none" accept=".json" onchange="importData(event)">
+        </div>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="row g-3 mb-4 text-center">
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="card card-stat bg-white p-3">
+                <h6 class="text-muted text-uppercase small">👥 Tổng đối tượng</h6>
+                <h3 class="fw-bold text-dark" id="stat-tong">0</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="card card-stat bg-white p-3">
+                <h6 class="text-muted text-uppercase small">🏠 Khu</h6>
+                <h3 class="fw-bold text-success" id="stat-khu">0</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="card card-stat bg-white p-3">
+                <h6 class="text-muted text-uppercase small">⚕ Y tế</h6>
+                <h3 class="fw-bold text-info" id="stat-yte">0</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="card card-stat bg-white p-3">
+                <h6 class="text-muted text-uppercase small">🏥 Bệnh viện</h6>
+                <h3 class="fw-bold text-warning" id="stat-benhvien">0</h3>
+            </div>
+        </div>
+        <div class="col-6 col-md-2-4 col-lg">
+            <div class="card card-stat bg-white p-3">
+                <h6 class="text-muted text-uppercase small">🚨 Khám đột xuất</h6>
+                <h3 class="fw-bold text-danger" id="stat-kham">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bộ lọc & Tìm kiếm -->
+    <div class="table-container mb-4">
+        <div class="row g-3 align-items-center mb-3">
+            <div class="col-md-6">
+                <h5 class="m-0 fw-bold text-secondary"><i class="bi bi-search"></i> Kết quả tìm kiếm / danh sách</h5>
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="txtSearch" class="form-control" placeholder="Tìm kiếm theo tên, năm sinh, địa chỉ..." oninput="renderTable()">
+            </div>
+        </div>
+
+        <!-- Bảng danh sách -->
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Ảnh</th>
+                        <th>Họ và tên</th>
+                        <th>Năm sinh</th>
+                        <th>Giới tính</th>
+                        <th>Ngày nhập</th>
+                        <th>Đang ở</th>
+                        <th>Trạng thái</th>
+                        <th>Thuốc theo dõi</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">Chưa có dữ liệu đối tượng</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Section Khám Đột Xuất -->
+    <div class="table-container">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="m-0 fw-bold text-danger"><i class="bi bi-activity"></i> QUẢN LÝ KHÁM ĐỘT XUẤT</h5>
+            <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#modalKhamDotXuat"><i class="bi bi-plus-lg"></i> Thêm lượt khám</button>
+        </div>
+        <div class="btn-group btn-group-sm mb-3" role="group">
+            <button type="button" class="btn btn-outline-secondary active" onclick="filterKham('all', this)">Tất cả</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterKham('week', this)">Tuần này</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="filterKham('month', this)">Tháng này</button>
+        </div>
+        <div class="row g-3 mb-3 text-center small">
+            <div class="col-md-3">
+                <div class="p-2 border rounded bg-light">TỔNG LƯỢT: <strong id="kham-tong">0</strong></div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-2 border rounded bg-light text-info">THEO DÕI Y TẾ: <strong id="kham-yte">0</strong></div>
+            </div>
+            <div class="col-md-3">
+                <div class="p-2 border rounded bg-light text-success">CHO VỀ KHU: <strong id="kham-khu">0</strong></div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-sm table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Đối tượng</th>
+                        <th>Ngày giờ</th>
+                        <th>Lý do</th>
+                        <th>Hướng xử lý</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody id="tableKhamBody">
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-3">Chưa có bản ghi khám đột xuất</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thêm/Sửa Đối Tượng -->
+<div class="modal fade" id="modalDoiTuong" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="modalTitle">Thêm đối tượng mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-shadow="none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formDoiTuong" class="row g-3">
+                    <input type="hidden" id="editIndex">
+                    
+                    <!-- MỤC ẢNH ĐƯỢC THÊM MỚI THEO YÊU CẦU -->
+                    <div class="col-md-12 d-flex align-items-center gap-3 bg-light p-3 rounded border">
+                        <div>
+                            <img id="imgPreview" class="avatar-preview" src="https://via.placeholder.com/100?text=Anh+Dai+Dien" alt="Preview">
+                        </div>
+                        <div class="flex-grow-1">
+                            <label class="form-label fw-bold text-primary"><i class="bi bi-image"></i> Ảnh đối tượng</label>
+                            <input type="file" id="inpAnh" class="form-control" accept="image/*" onchange="previewImage(event)">
+                            <div class="form-text">Chọn file ảnh chân dung hoặc hồ sơ đối tượng.</div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">1. Họ và tên *</label>
+                        <input type="text" id="inpTen" class="form-control" required placeholder="Nguyễn Văn A">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">2. Năm sinh</label>
+                        <input type="number" id="inpNamSinh" class="form-control" placeholder="1990">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">3. Giới tính</label>
+                        <select id="inpGioiTinh" class="form-select">
+                            <option value="">-- Chọn --</option>
+                            <option value="Nam">Nam</option>
+                            <option value="Nữ">Nữ</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">4. Ngày nhập Trung tâm</label>
+                        <input type="date" id="inpNgayNhap" class="form-control">
+                    </div>
+                    <div class="col-md-8">
+                        <label class="form-label">5. Địa chỉ</label>
+                        <input type="text" id="inpDiaChi" class="form-control" placeholder="Số nhà, đường, phường/xã...">
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label">6. Bảo hiểm</label>
+                        <input type="text" id="inpBaoHiem" class="form-control" placeholder="Mã số BHYT (nếu có)">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">7. Đang ở</label>
+                        <input type="text" id="inpDangO" class="form-control" placeholder="Khu A, Phòng 101...">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">10. Tình trạng hồ sơ *</label>
+                        <select id="inpTinhTrangHoSo" class="form-select" onchange="toggleTinhTrangDates()" required>
+                            <option value="🟢 Đang quản lý">🟢 Đang quản lý</option>
+                            <option value="⚫ Tử vong">⚫ Tử vong</option>
+                            <option value="🔵 Hồi gia">🔵 Hồi gia</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4" id="divTuVong" style="display:none;">
+                        <label class="form-label text-danger fw-bold">Ngày tử vong *</label>
+                        <input type="date" id="inpNgayTuVong" class="form-control">
+                    </div>
+                    <div class="col-md-4" id="divHoiGia" style="display:none;">
+                        <label class="form-label text-primary fw-bold">Ngày hồi gia *</label>
+                        <input type="date" id="inpNgayHoiGia" class="form-control">
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">8. Thuốc đang theo dõi</label>
+                        <div class="d-flex gap-4 border p-2 rounded bg-white">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkHuyếtÁp">
+                                <label class="form-check-label" for="chkHuyếtÁp">Huyết áp</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkTâmThần">
+                                <label class="form-check-label" for="chkTâmThần">Tâm thần</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkBệnhKhác">
+                                <label class="form-check-label" for="chkBệnhKhác">Bệnh khác</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">9. Tình trạng hiện tại</label>
+                        <textarea id="inpTinhTrangHienTai" class="form-control" rows="2" placeholder="Sức khỏe ổn định, suy giảm trí nhớ nhẹ..."></textarea>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label class="form-label">11. Ghi chú</label>
+                        <textarea id="inpGhiChu" class="form-control" rows="2" placeholder="Thông tin bổ sung khác..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" onclick="saveDoiTuong()">💾 Lưu hồ sơ</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Khám Đột Xuất -->
+<div class="modal fade" id="modalKhamDotXuat" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Thêm lượt khám đột xuất</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formKham" class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Đối tượng *</label>
+                        <select id="khamDoiTuong" class="form-select" required>
+                            <option value="">-- Chọn đối tượng --</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Ngày giờ *</label>
+                        <input type="datetime-local" id="khamNgayGio" class="form-control" required>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Lý do *</label>
+                        <input type="text" id="khamLyDo" class="form-control" required placeholder="Sốt cao, đau bụng, chấn thương...">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label fw-bold">Hướng xử lý *</label>
+                        <select id="khamHuongXuLy" class="form-select" required>
+                            <option value="THEO DÕI Y TẾ">THEO DÕI Y TẾ</option>
+                            <option value="CHO VỀ KHU">CHO VỀ KHU</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12">
+                        <label class="form-label">Ghi chú</label>
+                        <textarea id="khamGhiChu" class="form-control" rows="2"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" onclick="saveKham()">💾 Lưu lượt khám</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Dữ liệu mẫu ban đầu để chạy thử nghiệm
+    let dataDoiTuong = JSON.parse(localStorage.getItem('TANHIEP_DOITUONG')) || [];
+    let dataKham = JSON.parse(localStorage.getItem('TANHIEP_KHAM')) || [];
+    let currentFilterKham = 'all';
+    let base64ImageStr = "";
+
+    // Khởi tạo app
+    document.addEventListener("DOMContentLoaded", () => {
+        updateStats();
+        renderTable();
+        renderKhamTable();
+        populateDoiTuongSelect();
+        
+        // Đặt thời gian hiện tại cho form khám đột xuất
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('khamNgayGio').value = now.toISOString().slice(0, 16);
+    });
+
+    function saveToStorage() {
+        localStorage.setItem('TANHIEP_DOITUONG', JSON.stringify(dataDoiTuong));
+        localStorage.setItem('TANHIEP_KHAM', JSON.stringify(dataKham));
+    }
+
+    // Xử lý ảnh preview & chuyển base64 để lưu trữ cục bộ
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imgPreview').src = e.target.result;
+                base64ImageStr = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function toggleTinhTrangDates() {
+        const value = document.getElementById('inpTinhTrangHoSo').value;
+        document.getElementById('divTuVong').style.display = value.includes('Tử vong') ? 'block' : 'none';
+        document.getElementById('divHoiGia').style.display = value.includes('Hồi gia') ? 'block' : 'none';
+    }
+
+    function resetForm() {
+        document.getElementById('formDoiTuong').reset();
+        document.getElementById('editIndex').value = '';
+        document.getElementById('modalTitle').innerText = 'Thêm đối tượng mới';
+        document.getElementById('imgPreview').src = 'https://via.placeholder.com/100?text=Anh+Dai+Dien';
+        base64ImageStr = "";
+        toggleTinhTrangDates();
+    }
+
+    function saveDoiTuong() {
+        const ten = document.getElementById('inpTen').value.trim();
+        const tinhTrangHoSo = document.getElementById('inpTinhTrangHoSo').value;
+        
+        if (!ten) { alert('Vui lòng nhập Họ và tên'); return; }
+
+        const item = {
+            anh: base64ImageStr || 'https://via.placeholder.com/100?text=No+Image',
+            ten: ten,
+            namSinh: document.getElementById('inpNamSinh').value,
+            gioiTinh: document.getElementById('inpGioiTinh').value,
+            ngayNhap: document.getElementById('inpNgayNhap').value,
+            diaChi: document.getElementById('inpDiaChi').value,
+            baoHiem: document.getElementById('inpBaoHiem').value,
+            dangO: document.getElementById('inpDangO').value,
+            tinhTrangHoSo: tinhTrangHoSo,
+            ngayTuVong: document.getElementById('inpNgayTuVong').value,
+            ngayHoiGia: document.getElementById('inpNgayHoiGia').value,
+            thuoc: {
+                huyetAp: document.getElementById('chkHuyếtÁp').checked,
+                tamThan: document.getElementById('chkTâmThần').checked,
+                benhKhac: document.getElementById('chkBệnhKhác').checked
+            },
+            tinhTrangHienTai: document.getElementById('inpTinhTrangHienTai').value,
+            ghiChu: document.getElementById('inpGhiChu').value,
+            ngayCapNhat: new Date().toLocaleDateString('vi-VN'),
+            nguoiCapNhat: "Cán bộ quản lý"
+        };
+
+        const editIndex = document.getElementById('editIndex').value;
+        if (editIndex === '') {
+            dataDoiTuong.push(item);
+        } else {
+            // Giữ lại ảnh cũ nếu không thay ảnh mới
+            if(!base64ImageStr && dataDoiTuong[editIndex].anh) {
+                item.anh = dataDoiTuong[editIndex].anh;
+            }
+            dataDoiTuong[editIndex] = item;
+        }
+
+        saveToStorage();
+        updateStats();
+        renderTable();
+        populateDoiTuongSelect();
+        
+        const modal = bootstrap.Modal.getInstance(document.getElementById('modalDoiTuong'));
+        modal.hide();
+    }
+
+    function editDoiTuong(index) {
+        resetForm();
+        const item = dataDoiTuong[index];
+        document.getElementById('editIndex').value = index;
+        document.getElementById('modalTitle').innerText = 'Cập nhật hồ sơ đối tượng';
+        
+        document.getElementById('imgPreview').src = item.anh;
+        document.getElementById('inpTen').value = item.ten;
+        document.getElementById('inpNamSinh').value = item.namSinh;
+        document.getElementById('inpGioiTinh').value = item.gioiTinh;
+        document.getElementById('inpNgayNhap').value = item.ngayNhap;
+        document.getElementById('inpDiaChi').value = item.diaChi;
+        document.getElementById('inpBaoHiem').value = item.baoHiem;
+        document.getElementById('inpDangO').value = item.dangO;
+        document.getElementById('inpTinhTrangHoSo').value = item.tinhTrangHoSo;
+        
+        toggleTinhTrangDates();
+        document.getElementById('inpNgayTuVong').value = item.ngayTuVong || '';
+        document.getElementById('inpNgayHoiGia').value = item.ngayHoiGia || '';
+        
+        document.getElementById('chkHuyếtÁp').checked = item.thuoc?.huyetAp || false;
+        document.getElementById('chkTâmThần').checked = item.thuoc?.tamThan || false;
+        document.getElementById('chkBệnhKhác').checked = item.thuoc?.benhKhac || false;
+        
+        document.getElementById('inpTinhTrangHienTai').value = item.tinhTrangHienTai || '';
+        document.getElementById('inpGhiChu').value = item.ghiChu || '';
+
+        const modal = new bootstrap.Modal(document.getElementById('modalDoiTuong'));
+        modal.show();
+    }
+
+    function deleteDoiTuong(index) {
+        if (confirm(`Bạn có chắc chắn muốn xóa đối tượng ${dataDoiTuong[index].ten}?`)) {
+            dataDoiTuong.splice(index, 1);
+            saveToStorage();
+            updateStats();
+            renderTable();
+            populateDoiTuongSelect();
+        }
+    }
+
+    function renderTable() {
+        const body = document.getElementById('tableBody');
+        const search = document.getElementById('txtSearch').value.toLowerCase().trim();
+        body.innerHTML = '';
+
+        const filtered = dataDoiTuong.filter(item => 
+            item.ten.toLowerCase().includes(search) || 
+            (item.namSinh && item.namSinh.toString().includes(search)) ||
+            (item.diaChi && item.diaChi.toLowerCase().includes(search))
+        );
+
+        if (filtered.length === 0) {
+            body.innerHTML = `<tr><td colspan="9" class="text-center text-muted py-4">Không tìm thấy đối tượng phù hợp</td></tr>`;
+            return;
+        }
+
+        filtered.forEach((item, idx) => {
+            const orgIndex = dataDoiTuong.indexOf(item);
+            
+            let listThuoc = [];
+            if(item.thuoc?.huyetAp) listThuoc.push('Huyết áp');
+            if(item.thuoc?.tamThan) listThuoc.push('Tâm thần');
+            if(item.thuoc?.benhKhac) listThuoc.push('Bệnh khác');
+            let txtThuoc = listThuoc.length > 0 ? listThuoc.join(', ') : 'Không';
+
+            let badgeColor = 'bg-success';
+            if(item.tinhTrangHoSo.includes('Tử vong')) badgeColor = 'bg-dark';
+            if(item.tinhTrangHoSo.includes('Hồi gia')) badgeColor = 'bg-primary';
+
+            body.innerHTML += `
+                <tr>
+                    <td><img src="${item.anh}" class="avatar-table border shadow-sm"></td>
+                    <td class="fw-bold text-dark">${item.ten}</td>
+                    <td>${item.namSinh || '---'}</td>
+                    <td>${item.gioiTinh || '---'}</td>
+                    <td>${item.ngayNhap ? new Date(item.ngayNhap).toLocaleDateString('vi-VN') : '---'}</td>
+                    <td><span class="badge bg-secondary">${item.dangO || 'Chưa xếp'}</span></td>
+                    <td><span class="badge ${badgeColor}">${item.tinhTrangHoSo}</span></td>
+                    <td class="small text-muted">${txtThuoc}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editDoiTuong(${orgIndex})"><i class="bi bi-pencil"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteDoiTuong(${orgIndex})"><i class="bi bi-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function updateStats() {
+        document.getElementById('stat-tong').innerText = dataDoiTuong.length;
+        
+        let khuSet = new Set();
+        let yTeCount = 0;
+        let benhVienCount = 0;
+        
+        dataDoiTuong.forEach(item => {
+            if(item.dangO) khuSet.add(item.dangO.toLowerCase());
+            if(item.thuoc?.huyetAp || item.thuoc?.tamThan || item.thuoc?.benhKhac) {
+                yTeCount++;
+            }
+            if(item.tinhTrangHienTai && (item.tinhTrangHienTai.toLowerCase().includes('bệnh viện') || item.tinhTrangHienTai.toLowerCase().includes('nằm viện'))) {
+                benhVienCount++;
+            }
+        });
+
+        document.getElementById('stat-khu').innerText = khuSet.size;
+        document.getElementById('stat-yte').innerText = yTeCount;
+        document.getElementById('stat-benhvien').innerText = benhVienCount;
+        document.getElementById('stat-kham').innerText = dataKham.length;
+    }
+
+    // Phần Khám Đột Xuất
+    function populateDoiTuongSelect() {
+        const select = document.getElementById('khamDoiTuong');
+        select.innerHTML = '<option value="">-- Chọn đối tượng --</option>';
+        dataDoiTuong.forEach(item => {
+            select.innerHTML += `<option value="${item.ten}">${item.ten} (${item.dangO || 'Khu trống'})</option>`;
+        });
+    }
+
+    function saveKham() {
+        const doiTuong = document.getElementById('khamDoiTuong').value;
+        const ngayGio = document.getElementById('khamNgayGio').value;
+        const lyDo = document.getElementById('khamLyDo').value.trim();
+        const huongXuLy = document.getElementById('khamHuongXuLy').value;
+
+        if(!doiTuong || !ngayGio || !lyDo) { alert('Vui lòng điền đầy đủ các trường bắt buộc (*)'); return; }
+
+        const item = {
+            doiTuong: doiTuong,
+            ngayGio: ngayGio,
+            lyDo: lyDo,
+            huongXuLy: huongXuLy,
+            ghiChu: document.getElementById('khamGhiChu').value
+        };
+
+        dataKham.push(item);
+        saveToStorage();
+        updateStats();
+        renderKhamTable();
+        
+        document.getElementById('formKham').reset();
+        bootstrap.Modal.getInstance(document.getElementById('modalKhamDotXuat')).hide();
+    }
+
+    function filterKham(type, btn) {
+        currentFilterKham = type;
+        document.querySelectorAll('.btn-group button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderKhamTable();
+    }
+
+    function renderKhamTable() {
+        const body = document.getElementById('tableKhamBody');
+        body.innerHTML = '';
+        
+        let filtered = [...dataKham];
+        const now = new Date();
+
+        if (currentFilterKham === 'week') {
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            filtered = dataKham.filter(item => new Date(item.ngayGio) >= oneWeekAgo);
+        } else if (currentFilterKham === 'month') {
+            const oneMonthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+            filtered = dataKham.filter(item => new Date(item.ngayGio) >= oneMonthAgo);
+        }
+
+        document.getElementById('kham-tong').innerText = filtered.length;
+        document.getElementById('kham-yte').innerText = filtered.filter(i => i.huongXuLy === 'THEO DÕI Y TẾ').length;
+        document.getElementById('kham-khu').innerText = filtered.filter(i => i.huongXuLy === 'CHO VỀ KHU').length;
+
+        if (filtered.length === 0) {
+            body.innerHTML = `<tr><td colspan="5" class="text-center text-muted py-3">Không có bản ghi khám đột xuất nào thỏa mãn</td></tr>`;
+            return;
+        }
+
+        filtered.sort((a,b) => new Date(b.ngayGio) - new Date(a.ngayGio)).forEach(item => {
+            let badgeClass = item.huongXuLy === 'THEO DÕI Y TẾ' ? 'bg-info' : 'bg-success';
+            body.innerHTML += `
+                <tr>
+                    <td class="fw-bold">${item.doiTuong}</td>
+                    <td>${new Date(item.ngayGio).toLocaleString('vi-VN')}</td>
+                    <td>${item.lyDo}</td>
+                    <td><span class="badge ${badgeClass}">${item.huongXuLy}</span></td>
+                    <td class="text-muted small">${item.ghiChu || '---'}</td>
+                </tr>
+            `;
+        });
+    }
+
+    // Nhập/Xuất file JSON
+    function exportData() {
+        const fullData = { doiTuong: dataDoiTuong, khamDotXuat: dataKham };
+        const blob = new Blob([JSON.stringify(fullData, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `DuLieu_TrungTamTanHiep_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+
+    function triggerImport() { document.getElementById('importFile').click(); }
+    
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const parsed = JSON.parse(e.target.result);
+                if (parsed.doiTuong || parsed.khamDotXuat) {
+                    dataDoiTuong = parsed.doiTuong || [];
+                    dataKham = parsed.khamDotXuat || [];
+                    saveToStorage();
+                    updateStats();
+                    renderTable();
+                    renderKhamTable();
+                    populateDoiTuongSelect();
+                    alert("Nhập dữ liệu thành công!");
+                } else {
+                    alert("Cấu trúc file không đúng chuẩn.");
+                }
+            } catch (err) {
+                alert("Lỗi đọc file: Định dạng JSON không hợp lệ.");
+            }
+        };
+        reader.readAsText(file);
+    }
+</script>
+</body>
+</html>
