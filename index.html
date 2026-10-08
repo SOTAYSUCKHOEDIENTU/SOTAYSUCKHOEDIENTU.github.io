@@ -1,289 +1,154 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý đối tượng - Trung tâm BTXH Tân Hiệp</title>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --success-color: #27ae60;
-            --danger-color: #e74c3c;
-            --warning-color: #f39c12;
-            --info-color: #2980b9;
-            --dark-color: #34495e;
-            --gray-light: #f8f9fa;
-        }
-        
-        * {
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            margin: 0;
-            padding: 10px;
-            background-color: #f5f7fa;
-            color: #333;
-        }
-
-        @media (min-width: 768px) {
-            body { padding: 20px; }
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            color: var(--primary-color);
-            text-align: center;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-            margin-bottom: 5px;
-            font-size: 1.6rem;
-        }
-
-        @media (min-width: 768px) {
-            h1 { font-size: 2.2rem; }
-        }
-
-        .subtitle {
-            text-align: center;
-            color: #7f8c8d;
-            margin-top: 0;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-        
-        /* THANH THỐNG KÊ TỔNG QUAN (RESPONSIVE) */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .stats-grid {
-                grid-template-columns: repeat(5, 1fr);
-                gap: 15px;
-            }
-        }
-
-        .stat-card {
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-align: center;
-            border-top: 4px solid var(--primary-color);
-        }
-        .stat-card.y-te { border-top-color: var(--warning-color); }
-        .stat-card.hospital { border-top-color: var(--danger-color); }
-        .stat-card.kham-dx { border-top-color: #8e44ad; }
-
-        .stat-card h3 { 
-            margin: 0 0 5px 0; 
-            font-size: 11px; 
-            color: #7f8c8d; 
-            text-transform: uppercase; 
-            letter-spacing: 0.5px;
-        }
-        .stat-card .value { 
-            font-size: 20px; 
-            font-weight: bold; 
-            color: var(--primary-color); 
-        }
-
-        @media (min-width: 768px) {
-            .stat-card { padding: 15px; }
-            .stat-card h3 { font-size: 13px; }
-            .stat-card .value { font-size: 26px; }
-        }
-        
-        /* NÚT THAO TÁC CƠ BẢN */
-        .btn-group {
-            margin-bottom: 15px;
-            display: flex;
-        }
-        
-        button {
-            padding: 10px 16px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 14px;
-            transition: opacity 0.2s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-        }
-        button:hover { opacity: 0.9; }
-        .btn-success { background-color: var(--success-color); color: white; width: 100%; }
-        @media (min-width: 768px) { .btn-success { width: auto; } }
-
-        .btn-edit { background-color: #f1f2f6; color: #2f3542; border: 1px solid #ced6e0; padding: 6px 12px; font-size: 13px; }
-        .btn-delete { background-color: #ffe0e6; color: var(--danger-color); padding: 6px 12px; font-size: 13px; }
-        .btn-dark { background-color: var(--dark-color); color: white; }
-        
-        /* DANH SÁCH ĐỐI TƯỢNG DẠNG THẺ (MOBILE) VÀ BẢNG (PC) */
-        .table-wrapper {
-            overflow-x: auto;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            display: none; /* Ẩn trên Mobile, hiện trên PC */
-        }
-
-        @media (min-width: 992px) {
-            .data-table { display: table; }
-        }
-
-        .data-table th, .data-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-        }
-        .data-table th { background-color: var(--primary-color); color: white; font-weight: 600; }
-        .data-table tbody tr:hover { background-color: #f8f9fa; }
-        
-        /* Giao diện Mobile Card List */
-        .cards-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        @media (min-width: 992px) {
-            .cards-list { display: none; }
-        }
-
-        .mobile-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            gap: 15px;
-            position: relative;
-            border-left: 5px solid #ccc;
-        }
-        .mobile-card.border-khu { border-left-color: var(--info-color); }
-        .mobile-card.border-yte { border-left-color: var(--warning-color); }
-        .mobile-card.border-benhvien { border-left-color: var(--danger-color); }
-
-        .mobile-card-img img, .avatar-cell img { 
-            width: 55px; height: 70px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; 
-        }
-        .mobile-card-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-        .mobile-card-info .name { font-weight: bold; color: var(--primary-color); font-size: 15px; }
-        .mobile-card-info .meta { font-size: 13px; color: #666; }
-        .mobile-card-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        /* BADGES TRẠNG THÁI VỊ TRÍ */
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
-            display: inline-block;
-        }
-        .status-khu { background-color: #e3f2fd; color: #2980b9; }
-        .status-yte { background-color: #fff3cd; color: #856404; }
-        .status-benhvien { background-color: #f8d7da; color: #721c24; }
-
-        /* MODAL POPUP DIALOG */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            padding: 10px;
-        }
-        .modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px; right: 15px;
-            font-size: 28px; cursor: pointer; color: #aaa;
-        }
-        .modal h2 { margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; font-size: 1.3rem; color: var(--primary-color); }
-        
-        /* BIỂU MẪU FORM */
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 14px; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
-        }
-        .checkbox-group {
-            display: flex; background: var(--gray-light); padding: 10px; border-radius: 4px; border: 1px solid #e9ecef;
-        }
-        .image-upload-wrapper { display: flex; gap: 15px; align-items: center; background: var(--gray-light); padding: 10px; border-radius: 4px; }
-        .image-preview-container { width: 60px; height: 75px; border: 1px dashed #bbb; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        .image-preview { width: 100%; height: 100%; object-fit: cover; display: none; }
-        
-        .flex-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SỔ TAY SỨC KHOẺ ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</title>
+<style>
+:root{--primary:#2c3e50;--success:#27ae60;--danger:#e74c3c;--warning:#f39c12;--info:#2980b9;--purple:#8e44ad;--bg:#f5f7fa}
+*{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
+body{margin:0;background:var(--bg);color:#333;padding:12px}.container{max-width:1400px;margin:auto}
+h1{text-align:center;color:var(--primary);margin:8px 0;border-bottom:2px solid var(--primary);padding-bottom:10px}
+.subtitle{text-align:center;color:#777;margin:0 0 18px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}
+.stat{background:#fff;border-radius:10px;padding:15px;text-align:center;box-shadow:0 2px 7px #00000010;border-top:4px solid var(--primary);cursor:pointer}
+.stat:nth-child(2){border-color:var(--info)}.stat:nth-child(3){border-color:var(--warning)}.stat:nth-child(4){border-color:var(--danger)}.stat:nth-child(5){border-color:var(--purple)}
+.stat small{display:block;color:#777;font-weight:600}.stat b{font-size:27px;color:var(--primary)}
+.toolbar{background:#fff;padding:12px;border-radius:10px;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
+input,select,textarea{width:100%;padding:10px;border:1px solid #ccd2d8;border-radius:6px;font-size:14px;background:#fff}
+button{border:0;border-radius:6px;padding:10px 14px;cursor:pointer;font-weight:600}
+.btn{color:#fff}.green{background:var(--success)}.blue{background:var(--info)}.red{background:var(--danger)}.dark{background:var(--primary)}.purple{background:var(--purple)}.gray{background:#eef1f4;color:#333}
+.search{flex:1;min-width:220px}
+.table-wrap{background:#fff;border-radius:10px;overflow:auto;box-shadow:0 2px 7px #00000010}
+table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;font-size:14px}th{background:var(--primary);color:#fff;position:sticky;top:0}
+.avatar{width:48px;height:58px;object-fit:cover;border-radius:5px;border:1px solid #ddd}.badge{display:inline-block;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600;background:#eef2f7;margin:2px}.khu{background:#e3f2fd;color:#1976d2}.yte{background:#fff3cd;color:#856404}.bv{background:#f8d7da;color:#721c24}
+.cards{display:none}.empty{text-align:center;padding:30px;color:#888}
+.modal{display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:12px}
+.modal.show{display:flex}.box{background:#fff;border-radius:10px;width:min(850px,100%);max-height:94vh;overflow:auto;padding:20px;position:relative}
+.close{position:absolute;right:15px;top:8px;font-size:28px;background:none;color:#777}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.field label{display:block;font-weight:600;margin-bottom:5px}.checks{display:flex;gap:14px;flex-wrap:wrap;padding:10px;background:#f7f8fa;border:1px solid #e5e7ea;border-radius:6px}.checks label{font-weight:normal}.checks input{width:auto}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.photo{display:flex;gap:15px;align-items:center}.preview{width:75px;height:90px;border:1px dashed #aaa;object-fit:cover;border-radius:6px}
+.section{font-weight:700;color:var(--primary);border-bottom:1px solid #ddd;padding-bottom:6px;margin:10px 0}.notice{background:#fff8e6;padding:10px;border-radius:6px;margin-bottom:10px;color:#7a5b00}
+.dx-list{display:grid;gap:8px}.dx-item{border:1px solid #ddd;border-radius:7px;padding:10px}.dx-item b{color:var(--primary)}
+@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.full{grid-column:auto}table{display:none}.cards{display:grid;gap:10px}.card{background:#fff;padding:12px;border-radius:9px;box-shadow:0 2px 6px #0001}.card-top{display:flex;gap:12px}.card h3{margin:0 0 5px}.toolbar button{flex:1}}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <h1>🏠 QUẢN LÝ ĐỐI TƯỢNG - BTXH TÂN HIỆP</h1>
-    <p class="subtitle">Hệ thống đồng bộ dữ liệu thông minh trên Máy tính & Điện thoại.</p>
+<h1>🏠 SỔ TAY SỨC KHOẺ ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</h1>
+<p class="subtitle">Quản lý hồ sơ, vị trí, thuốc và khám đột xuất</p>
 
-    <!-- THANH THỐNG KÊ QUÂN SỐ TỰ ĐỘNG CẬP NHẬT -->
-    <div class="stats-grid">
-        <div class="stat-card"><h3>👥 Tổng quân số</h3><div class="value" id="count-total">0</div></div>
-        <div class="stat-card"><h3>🏠 Tại Khu</h3><div class="value" id="count-khu">0</div></div>
-        <div class="stat-card y-te"><h3>⚕ Phòng Y Tế</h3><div class="value" id="count-yte">0</div></div>
-        <div class="stat-card hospital"><h3>🏥 Bệnh Viện ngoài</h3><div class="value" id="count-benhvien">0</div></div>
-        <div class="stat-card kham-dx"><h3>🚨 Khám đột xuất</h3><div class="value" id="count-dotxuat">0</div></div>
-    </div>
+<div class="stats">
+<div class="stat" onclick="setLocationFilter('all')"><small>👥 Tổng quân số</small><b id="total">0</b></div>
+<div class="stat" onclick="setLocationFilter('Khu')"><small>🏠 Tại Khu</small><b id="countKhu">0</b></div>
+<div class="stat" onclick="setLocationFilter('Phòng Y tế')"><small>⚕ Phòng Y tế</small><b id="countYte">0</b></div>
+<div class="stat" onclick="setLocationFilter('Bệnh viện')"><small>🏥 Bệnh viện</small><b id="countBv">0</b></div>
+<div class="stat" onclick="openDxStats()"><small>🚨 Lượt khám đột xuất</small><b id="countDx">0</b></div>
+</div>
 
-    <div class="btn-group">
-        <button class="btn-success" onclick="openModal()">➕ Thêm đối tượng mới</button>
-    </div>
+<div class="toolbar">
+<button class="btn green" onclick="openPerson()">➕ Thêm đối tượng</button>
+<input id="search" class="search" placeholder="🔎 Tìm theo mã hoặc họ tên..." oninput="render()">
+<select id="filterStatus" onchange="render()"><option value="all">Tất cả trạng thái</option><option>Đang quản lý</option><option>Hồi gia</option><option>Tử vong</option></select>
+<select id="filterLocation" onchange="render()"><option value="all">Tất cả vị trí</option><option>Khu</option><option>Phòng Y tế</option><option>Bệnh viện</option></select>
+<button class="btn blue" onclick="exportData()">⬇ Sao lưu</button>
+<button class="btn gray" onclick="document.getElementById('importFile').click()">⬆ Khôi phục</button>
+<input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
+</div>
 
-    <!-- KHU VỰC HIỂN THỊ TRÊN MÁY TÍNH (BẢNG TĨNH) -->
-    <div class="table-wrapper">
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Ảnh</th>
-                    <th>Mã ĐT</th>
-                    <th>Họ và Tên</th>
-                    <th>Năm sinh</th>
-                    <th>Khu vực / Vị trí</th>
-                    <th>Thuốc theo dõi</th>
-                    <th>Trạng thái</th>
-                    <th>Thao tác</th>
-                </tr>
+<div class="table-wrap">
+<table><thead><tr><th>Ảnh</th><th>Mã ĐT</th><th>Họ và tên</th><th>Năm sinh</th><th>Địa chỉ</th><th>Vị trí</th><th>Thuốc</th><th>Trạng thái</th><th>Thao tác</th></tr></thead>
+<tbody id="tbody"></tbody></table>
+<div id="cards" class="cards"></div>
+<div id="empty" class="empty" style="display:none">Chưa có đối tượng. Hãy bấm “Thêm đối tượng”.</div>
+</div>
+</div>
+
+<div id="personModal" class="modal">
+<div class="box">
+<button class="close" onclick="closeModal('personModal')">×</button>
+<h2 id="modalTitle">Thêm đối tượng mới</h2>
+<form id="personForm" onsubmit="savePerson(event)">
+<input type="hidden" id="editId">
+<div class="section">1. Thông tin hồ sơ</div>
+<div class="grid">
+<div class="field"><label>Mã đối tượng *</label><input id="ma" required></div>
+<div class="field"><label>Họ và tên *</label><input id="ten" required></div>
+<div class="field"><label>Năm sinh</label><input id="namsinh" type="number" min="1900" max="2100"></div>
+<div class="field"><label>Ngày nhập Trung tâm</label><input id="ngaynhap" type="date"></div>
+<div class="field full"><label>Địa chỉ</label><textarea id="diachi" rows="2"></textarea></div>
+<div class="field"><label>Đang ở</label><select id="vitri" onchange="toggleLocationFields()"><option>Khu</option><option>Phòng Y tế</option><option>Bệnh viện</option></select></div>
+<div class="field" id="khuWrap"><label>Khu</label><select id="khu"><option>Khu 1</option><option>Khu 2</option><option>Khu 3</option><option>Khu 4</option></select></div>
+<div class="field full" id="bvWrap" style="display:none"><label>Thông tin bệnh viện</label><input id="bvInfo" placeholder="Tên bệnh viện / bệnh điều trị / ghi chú"></div>
+<div class="field full"><label>Ảnh</label><div class="photo"><img id="preview" class="preview" alt=""><input id="photo" type="file" accept="image/*" onchange="previewPhoto(event)"></div></div>
+</div>
+<div class="section">2. Uống thuốc</div>
+<div class="checks">
+<label><input type="checkbox" id="thuocHA"> Huyết áp</label>
+<label><input type="checkbox" id="thuocTT"> Tâm thần</label>
+<label><input type="checkbox" id="thuocKhac"> Bệnh khác</label>
+</div>
+<div class="field" style="margin-top:8px"><label>Chi tiết bệnh khác</label><input id="thuocKhacText"></div>
+
+<div class="section">3. Trạng thái hồ sơ</div>
+<div class="grid">
+<div class="field"><label>Trạng thái</label><select id="trangthai" onchange="toggleStatusDate()"><option>Đang quản lý</option><option>Hồi gia</option><option>Tử vong</option></select></div>
+<div class="field" id="statusDateWrap" style="display:none"><label id="statusDateLabel">Ngày</label><input id="statusDate" type="date"></div>
+</div>
+<div class="actions"><button type="button" class="btn gray" onclick="closeModal('personModal')">Hủy</button><button class="btn green">💾 Lưu đối tượng</button></div>
+</form>
+</div></div>
+
+<div id="detailModal" class="modal"><div class="box"><button class="close" onclick="closeModal('detailModal')">×</button><div id="detail"></div></div></div>
+<div id="dxModal" class="modal"><div class="box"><button class="close" onclick="closeModal('dxModal')">×</button><div id="dxContent"></div></div></div>
+
+<script>
+const KEY='btxh_tan_hiep_v2';
+let people=JSON.parse(localStorage.getItem(KEY)||'[]');
+let photoData='';
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(people))}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function openModal(id='personModal'){ $(id).classList.add('show') }
+function closeModal(id){$(id).classList.remove('show')}
+function toggleLocationFields(){let v=$('vitri').value;$('khuWrap').style.display=v==='Khu'?'block':'none';$('bvWrap').style.display=v==='Bệnh viện'?'block':'none'}
+function toggleStatusDate(){let v=$('trangthai').value;let yes=v!=='Đang quản lý';$('statusDateWrap').style.display=yes?'block':'none';$('statusDateLabel').textContent=v==='Hồi gia'?'Ngày hồi gia':'Ngày tử vong'}
+function previewPhoto(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{photoData=r.result;$('preview').src=photoData};r.readAsDataURL(f)}
+function openPerson(id=null){
+$('personForm').reset();$('editId').value='';photoData='';$('preview').src='';$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
+if(id){let p=people.find(x=>x.id===id);if(!p)return;$('modalTitle').textContent='Sửa thông tin đối tượng';$('editId').value=id;
+['ma','ten','namsinh','ngaynhap','diachi','vitri','khu','bvInfo','thuocKhacText','trangthai','statusDate'].forEach(k=>{if($(k)&&p[k]!=null)$(k).value=p[k]});
+$('thuocHA').checked=!!p.thuocHA;$('thuocTT').checked=!!p.thuocTT;$('thuocKhac').checked=!!p.thuocKhac;photoData=p.photo||'';$('preview').src=photoData;toggleLocationFields();toggleStatusDate()}
+openModal()
+}
+function savePerson(e){
+e.preventDefault();let id=$('editId').value;let old=id?people.find(p=>p.id===id):null;
+let p={id:id||uid(),ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,ngaynhap:$('ngaynhap').value,diachi:$('diachi').value.trim(),vitri:$('vitri').value,khu:$('khu').value,bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
+if(!p.ma||!p.ten)return alert('Vui lòng nhập Mã đối tượng và Họ tên.');
+if(id){people=people.map(x=>x.id===id?p:x)}else{if(people.some(x=>x.ma===p.ma))return alert('Mã đối tượng đã tồn tại.');p.khamDotXuat=[];people.push(p)}
+save();closeModal('personModal');render()
+}
+function delPerson(id){let p=people.find(x=>x.id===id);if(!p)return;if(confirm('Xóa đối tượng '+p.ten+'?')){people=people.filter(x=>x.id!==id);save();render()}}
+function locationText(p){return p.vitri==='Khu'?p.khu:p.vitri==='Bệnh viện'?'Bệnh viện':p.vitri}
+function meds(p){let a=[];if(p.thuocHA)a.push('Huyết áp');if(p.thuocTT)a.push('Tâm thần');if(p.thuocKhac)a.push(p.thuocKhacText||'Bệnh khác');return a.length?a.join(', '):'—'}
+function render(){
+let q=$('search').value.toLowerCase(),fs=$('filterStatus').value,fl=$('filterLocation').value;
+let arr=people.filter(p=>(!q||(p.ten||'').toLowerCase().includes(q)||(p.ma||'').toLowerCase().includes(q))&&(fs==='all'||p.trangthai===fs)&&(fl==='all'||p.vitri===fl));
+$('total').textContent=people.length;$('countKhu').textContent=people.filter(p=>p.vitri==='Khu').length;$('countYte').textContent=people.filter(p=>p.vitri==='Phòng Y tế').length;$('countBv').textContent=people.filter(p=>p.vitri==='Bệnh viện').length;$('countDx').textContent=people.reduce((n,p)=>n+(p.khamDotXuat||[]).length,0);
+$('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${p.vitri==='Khu'?'khu':p.vitri==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai)}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button> <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button></td></tr>`).join('');
+$('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai)}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem</button> <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button></div>`).join('');
+$('empty').style.display=arr.length?'none':'block'
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function viewPerson(id){let p=people.find(x=>x.id===id);if(!p)return;let dx=p.khamDotXuat||[];$('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai)}</div><div class="grid">
+<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>Ngày nhập:</b> ${esc(p.ngaynhap||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div></div>
+<div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="addDx('${p.id}')">➕ Thêm lần khám</button><div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map((d,i)=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;openModal('detailModal')}
+function addDx(id){let p=people.find(x=>x.id===id);if(!p)return;let dt=prompt('Ngày giờ khám (VD: 08/10/2026 09:30):',new Date().toLocaleString('vi-VN'));if(!dt)return;let reason=prompt('Lý do khám:');if(!reason)return;let action=prompt('Hướng xử lý (Theo dõi y tế / Cho về khu):','Theo dõi y tế')||'';p.khamDotXuat=p.khamDotXuat||[];p.khamDotXuat.push({dateTime:dt,reason,action});save();viewPerson(id);render()}
+function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma})));$('dxContent').innerHTML=`<h2>🚨 Thống kê khám đột xuất</h2><div class="notice">Tổng lượt: <b>${all.length}</b></div><div class="dx-list">${all.length?all.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có dữ liệu.'}</div>`;openModal('dxModal')}
+function setLocationFilter(v){$('filterLocation').value=v;render()}
+function exportData(){let blob=new Blob([JSON.stringify(people,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BTXH_Tan_Hiep_backup.json';a.click();URL.revokeObjectURL(a.href)}
+function importData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;people=d;save();render();alert('Khôi phục dữ liệu thành công.')}catch{alert('File sao lưu không hợp lệ.')}};r.readAsText(f);e.target.value=''}
+window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
+render();
+</script>
+</body>
+</html>
