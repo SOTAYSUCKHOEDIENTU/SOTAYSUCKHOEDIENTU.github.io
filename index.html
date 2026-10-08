@@ -110,6 +110,10 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div class="field"><label>Ngày nhập Trung tâm</label><input id="ngaynhap" type="date"></div>
     <div class="field"><label>Nhà</label><select id="nha"><option value="">-- Chọn Nhà --</option><option>Nhà 1</option><option>Nhà 2</option><option>Nhà 3</option><option>Nhà 4</option></select></div>
 <div class="field full"><label>Địa chỉ</label><textarea id="diachi" rows="2"></textarea></div>
+    <div class="field full"><label>👨‍👩‍👧 Người thân</label></div>
+    <div class="field"><label>Họ tên người thân</label><input id="nguoiThan" placeholder="Nhập họ tên người thân"></div>
+    <div class="field"><label>Quan hệ</label><select id="quanHe"><option value="">-- Chọn quan hệ --</option><option>Con</option><option>Cháu</option><option>Anh/Chị/Em</option><option>Người giám hộ</option><option>Khác</option></select></div>
+    <div class="field"><label>Số điện thoại</label><input id="sdtNguoiThan" type="tel" inputmode="tel" placeholder="Nhập số điện thoại"></div>
 <div class="field"><label>Đang ở</label><select id="vitri" onchange="toggleLocationFields()"><option>Khu</option><option>Phòng Y tế</option><option>Bệnh viện</option></select></div>
 <div class="field"><label>BHYT</label><input id="bhyt" placeholder="Nhập số thẻ BHYT"></div>
 <div class="field full" id="bvWrap" style="display:none"><label>Thông tin bệnh viện</label><input id="bvInfo" placeholder="Tên bệnh viện / bệnh điều trị / ghi chú"></div>
@@ -225,7 +229,7 @@ function openPerson(id=null){
   if(id){
     const p=people.find(x=>x.id===id);if(!p)return;
     $('modalTitle').textContent='Sửa thông tin đối tượng';$('editId').value=id;
-    ['ma','ten','namsinh','cccd','ngaynhap','nha','diachi','vitri','bhyt','bvInfo','thuocKhacText','trangthai','statusDate'].forEach(k=>{if($(k)&&p[k]!=null)$(k).value=p[k]});
+    ['ma','ten','namsinh','cccd','ngaynhap','nha','diachi','nguoiThan','quanHe','sdtNguoiThan','vitri','bhyt','bvInfo','thuocKhacText','trangthai','statusDate'].forEach(k=>{if($(k)&&p[k]!=null)$(k).value=p[k]});
     $('coCccd').value=p.cccd?'Có':'Không';toggleCccd();$('thuocHA').checked=!!p.thuocHA;$('thuocTT').checked=!!p.thuocTT;$('thuocKhac').checked=!!p.thuocKhac;photoData=p.photo||'';$('preview').src=photoData;toggleLocationFields();toggleStatusDate();
   }
   openModal('personModal');
@@ -234,7 +238,7 @@ async function savePerson(e){
   e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
   const id=$('editId').value||uid();
   const old=people.find(p=>p.id===id);
-  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
+  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
   if(!p.ma||!p.ten)return alert('Vui lòng nhập Mã đối tượng và Họ tên.');
   if(!old)p.khamDotXuat=[];
   try{
@@ -314,7 +318,7 @@ function render(){
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
 function viewPerson(id){
   let p=people.find(x=>x.id===id);if(!p)return;let dx=p.khamDotXuat||[];
-  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập:</b> ${esc(p.ngaynhap||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="openDxForm('${p.id}')">➕ Thêm lần khám</button>${isManager()?` <button class="btn blue" onclick="openPerson('${p.id}')">✏️ Sửa hồ sơ</button> <button class="btn red" onclick="delPerson('${p.id}');closeModal('detailModal')">🗑️ Xóa</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
+  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập:</b> ${esc(p.ngaynhap||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Người thân:</b> ${esc(p.nguoiThan||'—')}</div><div><b>Quan hệ:</b> ${esc(p.quanHe||'—')}</div><div><b>SĐT người thân:</b> ${esc(p.sdtNguoiThan||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="openDxForm('${p.id}')">➕ Thêm lần khám</button>${isManager()?` <button class="btn blue" onclick="openPerson('${p.id}')">✏️ Sửa hồ sơ</button> <button class="btn red" onclick="delPerson('${p.id}');closeModal('detailModal')">🗑️ Xóa</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
   openModal('detailModal');
 }
 function toLocalInputValue(d=new Date()){
