@@ -277,11 +277,37 @@ function openDxWeekly(){
   $('weeklyStats').style.display='grid'; $('weeklyStats').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
-  let q=($('search').value||'').toLowerCase(),fs=$('filterStatus').value,fl=$('filterLocation').value;
-  let arr=people.filter(p=>(!q||(p.ten||'').toLowerCase().includes(q)||(p.ma||'').toLowerCase().includes(q))&&(fs==='all'||p.trangthai===fs)&&(fl==='all'||p.vitri===fl));
-  $('total').textContent=people.length;$('countKhu').textContent=people.filter(p=>p.vitri==='Khu').length;$('countYte').textContent=people.filter(p=>p.vitri==='Phòng Y tế').length;$('countBv').textContent=people.filter(p=>p.vitri==='Bệnh viện').length;$('countDx').textContent=people.reduce((n,p)=>n+(p.khamDotXuat||[]).length,0);$('countMed').textContent=people.filter(isTakingMedicine).length;$('countDxWeek').textContent=weeklyDx().length;
+  let q=($('search').value||'').trim().toLowerCase(),fs=$('filterStatus').value,fl=$('filterLocation').value;
+
+  $('total').textContent=people.length;
+  $('countKhu').textContent=people.filter(p=>p.vitri==='Khu').length;
+  $('countYte').textContent=people.filter(p=>p.vitri==='Phòng Y tế').length;
+  $('countBv').textContent=people.filter(p=>p.vitri==='Bệnh viện').length;
+  $('countDx').textContent=people.reduce((n,p)=>n+(p.khamDotXuat||[]).length,0);
+  $('countMed').textContent=people.filter(isTakingMedicine).length;
+  $('countDxWeek').textContent=weeklyDx().length;
+
+  // Ẩn toàn bộ thông tin đối tượng khi chưa nhập tên.
+  if(!q){
+    $('tbody').innerHTML='';
+    $('cards').innerHTML='';
+    $('empty').textContent='🔎 Nhập tên đối tượng vào ô tìm kiếm để xem thông tin.';
+    $('empty').style.display='block';
+    updateAuthUI();
+    return;
+  }
+
+  let arr=people.filter(p=>
+    (p.ten||'').toLowerCase().includes(q) &&
+    (fs==='all'||p.trangthai===fs) &&
+    (fl==='all'||p.vitri===fl)
+  );
+
   $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${p.vitri==='Khu'?'khu':p.vitri==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
+
   $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}</div>`).join('');
+
+  $('empty').textContent=arr.length?'':'🔎 Không tìm thấy đối tượng phù hợp.';
   $('empty').style.display=arr.length?'none':'block';
   updateAuthUI();
 }
