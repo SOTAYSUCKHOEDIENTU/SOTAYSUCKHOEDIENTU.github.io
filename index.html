@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SỔ TAY SỨC KHOẺ ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</title>
+<title>SỔ TAY SỨC KHỎE ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</title>
 <style>
 :root{--primary:#2c3e50;--success:#27ae60;--danger:#e74c3c;--warning:#f39c12;--info:#2980b9;--purple:#8e44ad;--bg:#f5f7fa}
 *{box-sizing:border-box;font-family:Segoe UI,Tahoma,sans-serif}
@@ -13,7 +13,7 @@ h1{text-align:center;color:var(--primary);margin:8px 0;border-bottom:2px solid v
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:15px}
 .stat{background:#fff;border-radius:10px;padding:15px;text-align:center;box-shadow:0 2px 7px #00000010;border-top:4px solid var(--primary);cursor:pointer}
 .stat:nth-child(2){border-color:var(--info)}.stat:nth-child(3){border-color:var(--warning)}.stat:nth-child(4){border-color:var(--danger)}.stat:nth-child(5){border-color:var(--purple)}
-.stat small{display:block;color:#777;font-weight:600}.stat b{font-size:27px;color:var(--primary)}
+.stat small{display:block;color:#777;font-weight:600}.stat b{font-size:27px;color:var(--primary)}.medical-logo-card{background:linear-gradient(145deg,#ffffff,#eaf8f8);border-radius:10px;padding:12px 8px;text-align:center;box-shadow:0 2px 7px #00000010;border-top:4px solid #36a99e;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:105px}.medical-logo-icon{width:58px;height:58px}.medical-logo-icon svg{display:block;width:100%;height:100%}.medical-logo-card small{display:block;color:#2474a5;font-weight:700;font-size:13px}.medical-logo-card span{font-size:11px;color:#66818b}
 .toolbar{background:#fff;padding:12px;border-radius:10px;display:flex;gap:10px;flex-wrap:wrap;margin-bottom:15px}
 input,select,textarea{width:100%;padding:10px;border:1px solid #ccd2d8;border-radius:6px;font-size:14px;background:#fff}
 button{border:0;border-radius:6px;padding:10px 14px;cursor:pointer;font-weight:600}
@@ -25,43 +25,45 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 .cards{display:none}.empty{text-align:center;padding:30px;color:#888}
 .modal{display:none;position:fixed;inset:0;background:#0008;z-index:50;align-items:center;justify-content:center;padding:12px}
 .modal.show{display:flex}.box{background:#fff;border-radius:10px;width:min(850px,100%);max-height:94vh;overflow:auto;padding:20px;position:relative;-webkit-overflow-scrolling:touch}.modal input,.modal select,.modal textarea,.modal button{touch-action:manipulation}.modal form{width:100%}
-.close{position:absolute;right:15px;top:8px;font-size:28px;background:none;color:#777}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.field label{display:block;font-weight:600;margin-bottom:5px}.checks{display:flex;gap:14px;flex-wrap:wrap;padding:10px;background:#f7f8fa;border:1px solid #e5e7ea;border-radius:6px}.checks label{font-weight:normal}.checks input{width:auto}
+.close{position:absolute;right:15px;top:8px;font-size:28px;background:none;color:#777}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.full{grid-column:1/-1}.field label{display:block;font-weight:600;margin-bottom:5px}.checks{display:flex;gap:14px;flex-wrap:wrap;padding:10px;background:#f7f8fa;border:1px solid #e5e7ea;border-radius:6px}.checks label{font-weight:normal}.checks input{width:auto}.field label input[type="checkbox"]{width:auto;margin-right:6px}
 .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.photo{display:flex;gap:15px;align-items:center}.preview{width:75px;height:90px;border:1px dashed #aaa;object-fit:cover;border-radius:6px}
 .section{font-weight:700;color:var(--primary);border-bottom:1px solid #ddd;padding-bottom:6px;margin:10px 0}.notice{background:#fff8e6;padding:10px;border-radius:6px;margin-bottom:10px;color:#7a5b00}
 .dx-list{display:grid;gap:8px}.dx-item{border:1px solid #ddd;border-radius:7px;padding:10px}.dx-item b{color:var(--primary)}
 .dx-form{display:grid;gap:12px}.dx-form .field label{font-size:14px}.dx-form-actions{display:flex;gap:8px;justify-content:flex-end}.dx-hint{font-size:13px;color:#666;background:#f7f8fa;border-radius:7px;padding:9px}
+.medical-logo{display:flex;align-items:center;justify-content:center;gap:8px;min-width:86px;padding:6px 12px;background:#fff;border:1px solid #dce5ec;border-radius:10px;color:#16834a;font-weight:800}.medical-cross{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:#e7f7ed;color:#16834a;font-size:24px;line-height:1}.medical-label{font-size:13px;letter-spacing:1px}
 @media(max-width:800px){body{padding:8px}.box{padding:16px}.modal{padding:8px}.dx-form-actions button{flex:1;min-height:46px}.stats{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.full{grid-column:auto}table{display:none}.cards{display:grid;gap:10px}.card{background:#fff;padding:12px;border-radius:9px;box-shadow:0 2px 6px #0001}.card-top{display:flex;gap:12px}.card h3{margin:0 0 5px}.toolbar button{flex:1}}
 </style>
 <link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#2c3e50"></head>
 <body>
 <div class="container">
-<h1>🏠 SỔ TAY SỨC KHOẺ ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</h1>
-<p class="subtitle">Quản lý hồ sơ, vị trí, thuốc và khám đột xuất</p>
+<h1>SỔ TAY SỨC KHỎE ĐIỆN TỬ - KHU CHĂM SÓC NUÔI DƯỠNG NGƯỜI CAO TUỔI</h1>
 
 <div class="stats">
-<div class="stat" onclick="setLocationFilter('all')"><small>👥 Tổng quân số</small><b id="total">0</b></div>
-<div class="stat" onclick="setLocationFilter('Khu')"><small>🏠 Tại Khu</small><b id="countKhu">0</b></div>
-<div class="stat" onclick="setLocationFilter('Phòng Y tế')"><small>⚕ Phòng Y tế</small><b id="countYte">0</b></div>
-<div class="stat" onclick="setLocationFilter('Bệnh viện')"><small>🏥 Bệnh viện</small><b id="countBv">0</b></div>
-<div class="stat" onclick="openDxStats()"><small>🚨 Lượt khám đột xuất</small><b id="countDx">0</b></div>
-<div class="stat"><small>💊 Người đang uống thuốc</small><b id="countMed">0</b></div>
-<div class="stat" onclick="openDxWeekly()"><small>📅 Khám đột xuất tuần này</small><b id="countDxWeek">0</b></div>
+<div class="stat" onclick="showDashboardList('all')"><small>Tổng quân số</small><b id="total">0</b></div>
+<div class="stat" onclick="showDashboardList('Khu')"><small>Tại Khu</small><b id="countKhu">0</b></div>
+<div class="stat" onclick="showDashboardList('Phòng Y tế')"><small>Phòng Y tế</small><b id="countYte">0</b></div>
+<div class="stat" onclick="showDashboardList('Bệnh viện')"><small>Bệnh viện</small><b id="countBv">0</b></div>
+<div class="stat" onclick="showDashboardList('dx')"><small>Lượt khám đột xuất</small><b id="countDx">0</b></div>
+<div class="stat" onclick="showDashboardList('med')"><small>Người đang uống thuốc</small><b id="countMed">0</b></div>
+<div class="stat" onclick="showDashboardList('dxweek')"><small>Khám đột xuất tuần này</small><b id="countDxWeek">0</b></div>
 </div>
+<div id="dashboardList" class="toolbar" style="display:none;grid-template-columns:1fr;gap:8px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b id="dashboardListTitle">Danh sách</b><button class="btn gray" onclick="hideDashboardList()">Đóng</button></div>
+<div id="dashboardListBody" class="dx-list"></div></div>
 <div id="weeklyStats" class="toolbar" style="display:none;display:grid;grid-template-columns:1fr;gap:8px">
-  <div><b>📅 Thống kê khám đột xuất trong tuần hiện tại</b></div>
+  <div><b>Thống kê khám đột xuất trong tuần hiện tại</b></div>
   <div id="weeklySummary" class="notice" style="margin:0"></div>
   <div id="weeklyList" class="dx-list"></div>
 </div>
 
 <div class="toolbar">
-<div id="authNotice" class="notice" style="margin:0;flex:1">👁️ Chế độ không đăng nhập: chỉ xem hồ sơ và thêm <b>Khám đột xuất</b>.</div>
-<button id="loginBtn" class="btn dark" onclick="openLogin()">🔐 Quản lý</button>
-<button id="logoutBtn" class="btn gray" style="display:none" onclick="logout()">🚪 Đăng xuất</button><button class="btn green manager-only" style="display:none" onclick="openPerson()">➕ Thêm đối tượng</button>
-<input id="search" class="search" placeholder="🔎 Tìm theo mã hoặc họ tên..." oninput="render()">
+<button id="loginBtn" class="btn dark" onclick="openLogin()">Quản lý</button>
+<button id="logoutBtn" class="btn gray" style="display:none" onclick="logout()">Đăng xuất</button><button class="btn green manager-only" style="display:none" onclick="openPerson()">Thêm đối tượng</button>
+<input id="search" class="search" placeholder="Tìm theo mã hoặc họ tên..." oninput="render()">
 <select id="filterStatus" onchange="render()"><option value="all">Tất cả trạng thái</option><option>Đang quản lý</option><option>Hồi gia</option><option>Tử vong</option></select>
 <select id="filterLocation" onchange="render()"><option value="all">Tất cả vị trí</option><option>Khu</option><option>Phòng Y tế</option><option>Bệnh viện</option></select>
-<button class="btn blue" onclick="exportData()">⬇ Sao lưu danh sách đang xem</button>
-<button class="btn gray" onclick="document.getElementById('importFile').click()">⬆ Khôi phục</button>
+<button class="btn blue" onclick="exportData()">Sao lưu danh sách đang xem</button>
+<button class="btn gray" onclick="document.getElementById('importFile').click()">Khôi phục</button>
 <input id="importFile" type="file" accept=".json" hidden onchange="importData(event)">
 </div>
 
@@ -76,12 +78,12 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div id="loginModal" class="modal">
 <div class="box" style="max-width:430px">
 <button class="close" onclick="closeModal('loginModal')">×</button>
-<h2>🔐 Đăng nhập Quản lý</h2>
+<h2>Đăng nhập Quản lý</h2>
 <p class="notice">Tài khoản này dùng để thêm, sửa và xóa hồ sơ. Nhân viên bình thường không cần đăng nhập.</p>
 <form onsubmit="login(event)">
 <div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username"></div>
 <div class="field" style="margin-top:10px"><label>Mật khẩu</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
-<div class="actions"><button type="button" class="btn gray" onclick="closeModal('loginModal')">Hủy</button><button class="btn green">🔑 Đăng nhập</button></div>
+<div class="actions"><button type="button" class="btn gray" onclick="closeModal('loginModal')">Hủy</button><button class="btn green">Đăng nhập</button></div>
 </form>
 </div></div>
 
@@ -110,7 +112,7 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div class="field"><label>Ngày nhập Trung tâm</label><input id="ngaynhap" type="date"></div>
     <div class="field"><label>Nhà</label><select id="nha"><option value="">-- Chọn Nhà --</option><option>Nhà 1</option><option>Nhà 2</option><option>Nhà 3</option><option>Nhà 4</option></select></div>
 <div class="field full"><label>Địa chỉ</label><textarea id="diachi" rows="2"></textarea></div>
-    <div class="field full"><label>👨‍👩‍👧 Người thân</label></div>
+    <div class="field full"><label>Thông tin người thân</label></div>
     <div class="field"><label>Họ tên người thân</label><input id="nguoiThan" placeholder="Nhập họ tên người thân"></div>
     <div class="field"><label>Quan hệ</label><select id="quanHe"><option value="">-- Chọn quan hệ --</option><option>Con</option><option>Cháu</option><option>Anh/Chị/Em</option><option>Người giám hộ</option><option>Khác</option></select></div>
     <div class="field"><label>Số điện thoại</label><input id="sdtNguoiThan" type="tel" inputmode="tel" placeholder="Nhập số điện thoại"></div>
@@ -126,28 +128,32 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <label><input type="checkbox" id="thuocKhac"> Bệnh khác</label>
 </div>
 <div class="field" style="margin-top:8px"><label>Chi tiết bệnh khác</label><input id="thuocKhacText"></div>
+<div class="field" style="margin-top:8px"><label>Tình trạng</label><input id="tinhTrang" placeholder="Nhập tình trạng hiện tại"></div>
 
 <div class="section">3. Trạng thái hồ sơ</div>
 <div class="grid">
 <div class="field"><label>Trạng thái</label><select id="trangthai" onchange="toggleStatusDate()"><option>Đang quản lý</option><option>Hồi gia</option><option>Tử vong</option></select></div>
 <div class="field" id="statusDateWrap" style="display:none"><label id="statusDateLabel">Ngày</label><input id="statusDate" type="date"></div>
 </div>
-<div class="actions"><button type="button" class="btn gray" onclick="closeModal('personModal')">Hủy</button><button class="btn green">💾 Lưu đối tượng</button></div>
+<div class="actions"><button type="button" class="btn gray" onclick="closeModal('personModal')">Hủy</button><button class="btn green">Lưu đối tượng</button></div>
 </form>
 </div></div>
 
 <div id="dxFormModal" class="modal">
 <div class="box" style="max-width:560px">
 <button class="close" onclick="closeModal('dxFormModal')">×</button>
-<h2>🚨 Thêm khám đột xuất</h2>
+<h2>Thêm khám đột xuất</h2>
 <div id="dxPersonName" class="notice"></div>
 <form id="dxForm" class="dx-form" onsubmit="saveDxForm(event)">
 <input type="hidden" id="dxPersonId">
-<div class="field"><label>📅 Ngày giờ khám *</label><input id="dxDateTime" type="datetime-local" required></div>
-<div class="field"><label>📝 Lý do khám *</label><textarea id="dxReason" rows="4" required placeholder="Nhập lý do khám..."></textarea></div>
-<div class="field"><label>🔽 Hướng xử lý *</label><select id="dxAction" required><option value="Theo dõi y tế">Theo dõi y tế</option><option value="Cho về khu">Cho về khu</option></select></div>
+<input type="hidden" id="dxEditId">
+<div class="field"><label>Ngày giờ khám *</label><input id="dxDateTime" type="datetime-local" required></div>
+<div class="field"><label>Lý do khám *</label><textarea id="dxReason" rows="4" required placeholder="Nhập lý do khám..."></textarea></div>
+<div class="field"><label>Hướng xử lý *</label><select id="dxAction" required><option value="Theo dõi y tế">Theo dõi y tế</option><option value="Cho về khu">Cho về khu</option></select></div>
+<div class="field"><label><input id="dxStayed" type="checkbox" style="width:auto" onchange="toggleDxReturnField()"> Đã trở về khu</label></div>
+<div class="field" id="dxReturnWrap" style="display:none"><label>Ngày giờ trở về khu *</label><input id="dxReturnDateTime" type="datetime-local"></div>
 <div class="dx-hint">Sau khi bấm Lưu, thông tin sẽ được lưu trực tiếp trên hệ thống dùng chung.</div>
-<div class="dx-form-actions"><button type="button" class="btn gray" onclick="closeModal('dxFormModal')">Hủy</button><button type="submit" class="btn purple">💾 Lưu khám</button></div>
+<div class="dx-form-actions"><button type="button" class="btn gray" onclick="closeModal('dxFormModal')">Hủy</button><button type="submit" class="btn purple">Lưu khám</button></div>
 </form>
 </div></div>
 
@@ -183,7 +189,7 @@ function updateAuthUI(){
   const m=isManager();
   $('loginBtn').style.display=m?'none':'inline-block';
   $('logoutBtn').style.display=m?'inline-block':'none';
-  $('authNotice').innerHTML=m?'🔐 <b>Chế độ Quản lý:</b> bạn có thể thêm, sửa, xóa hồ sơ và quản lý Khám đột xuất.':'👁️ <b>Chế độ không đăng nhập:</b> chỉ xem hồ sơ và thêm <b>Khám đột xuất</b>.';
+  const notice=$('authNotice'); if(notice) notice.style.display='none';
   document.querySelectorAll('.manager-only').forEach(x=>x.style.display=m?'inline-block':'none');
 }
 function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI()}
@@ -195,13 +201,13 @@ async function login(e){
     managerSession=await r.json();
     localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
     closeModal('loginModal'); $('loginPassword').value=''; updateAuthUI(); render();
-    alert('Đăng nhập quản lý thành công.');
-  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\nKiểm tra email và mật khẩu tài khoản quản lý trong Supabase.')}
+    alert('đăng nhập quản lý thành công.');
+  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\nKiểm tra email và mật khẩu tài kho?n quản lý trong Supabase.')}
 }
 function logout(){managerSession=null;localStorage.removeItem(SESSION_KEY);updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.')}
 function openLogin(){openModal('loginModal')}
 
-function showCloudError(err){console.error(err);alert('Không thực hiện được thao tác với Supabase.\n\n'+(err?.message||err));}
+function showCloudError(err){console.error(err);alert('Không thể thực hiện được thao tác v?i Supabase.\n\n'+(err?.message||err));}
 
 async function loadPeople(){
   try{
@@ -224,21 +230,21 @@ function resetPersonForm(){
   $('personForm').reset();$('editId').value='';photoData='';$('preview').src='';$('coCccd').value='Không';$('cccd').value='';toggleCccd();$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
 }
 function openPerson(id=null){
-  if(!isManager()){if(id)viewPerson(id);else alert('Bạn cần đăng nhập Quản lý để thêm đối tượng.');return;}
+  if(!isManager()){if(id)viewPerson(id);else alert('Bạn cần đăng nhập Qu?n lý ?? thêm đối tượng.');return;}
   resetPersonForm();
   if(id){
     const p=people.find(x=>x.id===id);if(!p)return;
     $('modalTitle').textContent='Sửa thông tin đối tượng';$('editId').value=id;
-    ['ma','ten','namsinh','cccd','ngaynhap','nha','diachi','nguoiThan','quanHe','sdtNguoiThan','vitri','bhyt','bvInfo','thuocKhacText','trangthai','statusDate'].forEach(k=>{if($(k)&&p[k]!=null)$(k).value=p[k]});
+    ['ma','ten','namsinh','cccd','ngaynhap','nha','diachi','nguoiThan','quanHe','sdtNguoiThan','vitri','bhyt','bvInfo','thuocKhacText','tinhTrang','trangthai','statusDate'].forEach(k=>{if($(k)&&p[k]!=null)$(k).value=p[k]});
     $('coCccd').value=p.cccd?'Có':'Không';toggleCccd();$('thuocHA').checked=!!p.thuocHA;$('thuocTT').checked=!!p.thuocTT;$('thuocKhac').checked=!!p.thuocKhac;photoData=p.photo||'';$('preview').src=photoData;toggleLocationFields();toggleStatusDate();
   }
   openModal('personModal');
 }
 async function savePerson(e){
-  e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
+  e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Qu?n lý.');return;}
   const id=$('editId').value||uid();
   const old=people.find(p=>p.id===id);
-  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
+  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),tinhTrang:$('tinhTrang').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
   if(!p.ma||!p.ten)return alert('Vui lòng nhập Mã đối tượng và Họ tên.');
   if(!old)p.khamDotXuat=[];
   try{
@@ -248,11 +254,16 @@ async function savePerson(e){
   }catch(err){showCloudError(err)}
 }
 async function delPerson(id){
-  if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
+  if(!isManager()){alert('Bạn cần đăng nhập Qu?n lý.');return;}
   const p=people.find(x=>x.id===id);if(!p)return;if(!confirm('Xóa đối tượng '+p.ten+'?'))return;
   try{const r=await api('so_tay_suc_khoe?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});if(!r.ok)throw new Error(await r.text());await loadPeople();}catch(err){showCloudError(err)}
 }
-function locationText(p){return p.vitri==='Khu'?p.khu:p.vitri==='Bệnh viện'?'Bệnh viện':p.vitri||''}
+function currentLocation(p){
+  const dx=(p.khamDotXuat||[]).slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
+  if(dx.length){const latest=decodeDxAction(dx[0].action||'');if(latest.stayed||latest.base==='Cho về khu')return 'Khu';if(latest.base==='Theo dõi y tế')return 'Phòng Y tế';}
+  return p.vitri||'';
+}
+function locationText(p){const v=currentLocation(p);return v==='Khu'?(p.khu||'Khu'):v==='Bệnh viện'?'Bệnh viện':v}
 function meds(p){let a=[];if(p.thuocHA)a.push('Huyết áp');if(p.thuocTT)a.push('Tâm thần');if(p.thuocKhac)a.push(p.thuocKhacText||'Bệnh khác');return a.length?a.join(', '):'—'}
 function isTakingMedicine(p){return !!(p.thuocHA||p.thuocTT||p.thuocKhac)}
 function parseDxDate(v){
@@ -272,30 +283,30 @@ function weekRange(d=new Date()){
 }
 function weeklyDx(){
   const {start,end}=weekRange();
-  return people.flatMap(p=>(p.khamDotXuat||[]).map(d=>{const dt=parseDxDate(d.dateTime);return dt&&dt>=start&&dt<=end?{...d,name:p.ten,ma:p.ma,dt}:null}).filter(Boolean)).sort((a,b)=>b.dt-a.dt);
+  return people.flatMap(p=>(p.khamDotXuat||[]).map(d=>{const dt=parseDxDate(d.dateTime);return dt&&dt>=start&&dt<=end?{...d,name:p.ten,ma:p.ma,personId:p.id,dt}:null}).filter(Boolean)).sort((a,b)=>b.dt-a.dt);
 }
 function openDxWeekly(){
   const list=weeklyDx(); const {start,end}=weekRange();
   $('weeklySummary').innerHTML=`Từ <b>${start.toLocaleDateString('vi-VN')}</b> đến <b>${end.toLocaleDateString('vi-VN')}</b>: <b>${list.length} lượt khám</b>.`;
-  $('weeklyList').innerHTML=list.length?list.map(d=>`<div class="dx-item"><b>${esc(d.dt.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}))}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có lượt khám đột xuất trong tuần này.';
+  $('weeklyList').innerHTML=list.length?list.map(d=>`<div class="dx-item"><b>${esc(d.dt.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}))}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Ch?a có lượt khám đột xuất trong tu?n này.';
   $('weeklyStats').style.display='grid'; $('weeklyStats').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
   let q=($('search').value||'').trim().toLowerCase(),fs=$('filterStatus').value,fl=$('filterLocation').value;
 
   $('total').textContent=people.length;
-  $('countKhu').textContent=people.filter(p=>p.vitri==='Khu').length;
-  $('countYte').textContent=people.filter(p=>p.vitri==='Phòng Y tế').length;
-  $('countBv').textContent=people.filter(p=>p.vitri==='Bệnh viện').length;
+  $('countKhu').textContent=people.filter(p=>currentLocation(p)==='Khu').length;
+  $('countYte').textContent=people.filter(p=>currentLocation(p)==='Phòng Y tế').length;
+  $('countBv').textContent=people.filter(p=>currentLocation(p)==='Bệnh viện').length;
   $('countDx').textContent=people.reduce((n,p)=>n+(p.khamDotXuat||[]).length,0);
   $('countMed').textContent=people.filter(isTakingMedicine).length;
   $('countDxWeek').textContent=weeklyDx().length;
 
-  // Ẩn toàn bộ thông tin đối tượng khi chưa nhập tên.
+  // Ẩn toàn bộ thông tin đối tượng khi ch?a nh?p tên.
   if(!q){
     $('tbody').innerHTML='';
     $('cards').innerHTML='';
-    $('empty').textContent='🔎 Nhập tên đối tượng vào ô tìm kiếm để xem thông tin.';
+    $('empty').textContent='Nhập tên đối tượng vào ô tìm kiếm để xem thông tin.';
     $('empty').style.display='block';
     updateAuthUI();
     return;
@@ -304,60 +315,99 @@ function render(){
   let arr=people.filter(p=>
     (p.ten||'').toLowerCase().includes(q) &&
     (fs==='all'||p.trangthai===fs) &&
-    (fl==='all'||p.vitri===fl)
+    (fl==='all'||currentLocation(p)===fl)
   );
 
-  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${p.vitri==='Khu'?'khu':p.vitri==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
+  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${currentLocation(p)==='Khu'?'khu':currentLocation(p)==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">S?a</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
 
-  $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}</div>`).join('');
+  $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">S?a</button>`:''}</div>`).join('');
 
-  $('empty').textContent=arr.length?'':'🔎 Không tìm thấy đối tượng phù hợp.';
+  $('empty').textContent=arr.length?'':'Không tìm thấy đối tượng phù hợp.';
   $('empty').style.display=arr.length?'none':'block';
   updateAuthUI();
 }
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function formatDateVN(value){if(!value)return '';const m=String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:String(value)}
 function viewPerson(id){
   let p=people.find(x=>x.id===id);if(!p)return;let dx=p.khamDotXuat||[];
-  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập:</b> ${esc(p.ngaynhap||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Người thân:</b> ${esc(p.nguoiThan||'—')}</div><div><b>Quan hệ:</b> ${esc(p.quanHe||'—')}</div><div><b>SĐT người thân:</b> ${esc(p.sdtNguoiThan||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="openDxForm('${p.id}')">➕ Thêm lần khám</button>${isManager()?` <button class="btn blue" onclick="openPerson('${p.id}')">✏️ Sửa hồ sơ</button> <button class="btn red" onclick="delPerson('${p.id}');closeModal('detailModal')">🗑️ Xóa</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
+  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập Trung tâm:</b> ${esc(formatDateVN(p.ngaynhap)||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Người thân:</b> ${esc(p.nguoiThan||'—')}</div><div><b>Quan hệ:</b> ${esc(p.quanHe||'—')}</div><div><b>SĐT người thân:</b> ${esc(p.sdtNguoiThan||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div><div class="full"><b>Tình trạng:</b> ${esc(p.tinhTrang||'—')}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="openDxForm('${p.id}')">＋ Thêm lần khám</button>${isManager()?` <button class="btn blue" onclick="openPerson('${p.id}')">✎ Sửa hồ sơ</button> <button class="btn red" onclick="delPerson('${p.id}');closeModal('detailModal')">Xóa</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}${isManager()?`<br><button class="btn blue" onclick="openDxForm('${p.id}','${d.id}')">Sửa lượt khám</button> <button class="btn red" onclick="deleteDx('${d.id}','${p.id}')">Xóa lượt khám</button>`:``}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
   openModal('detailModal');
 }
 function toLocalInputValue(d=new Date()){
   const pad=n=>String(n).padStart(2,'0');
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-function openDxForm(id){
-  const p=people.find(x=>x.id===id); if(!p)return;
-  $('dxPersonId').value=id;
-  $('dxPersonName').innerHTML=`Đối tượng: <b>${esc(p.ten)}</b> — Mã: <b>${esc(p.ma)}</b>`;
-  $('dxDateTime').value=toLocalInputValue();
-  $('dxReason').value='';
-  $('dxAction').value='Theo dõi y tế';
-  openModal('dxFormModal');
-  setTimeout(()=> $('dxReason').focus(),100);
+function encodeDxAction(base,returned,returnAt){return returned?`${base}||RETURNED=1||RETURN=${returnAt||''}`:base;}
+function decodeDxAction(action){const raw=String(action||'');const old=raw.match(/\|\|STAY=([^|]*)\|\|RETURN=([^|]*)/);const newer=raw.match(/\|\|RETURNED=([^|]*)\|\|RETURN=([^|]*)/);if(newer)return {base:raw.split('||RETURNED=')[0],stayed:newer[1]==='1',returnAt:newer[2]||''};return {base:raw.split('||STAY=')[0],stayed:!!(old&&old[1]==='1'),returnAt:old&&old[2]?old[2]:''};}
+function dxActionText(action){const d=decodeDxAction(action);return (d.base||'')+(d.stayed?' · Đã trở về khu'+(d.returnAt?' lúc '+formatDxDate(d.returnAt):''):'');}
+function formatDxDate(v){const d=parseDxDate(v);return d?d.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}):String(v||'');}
+function toggleDxReturnField(){const yes=$('dxStayed').checked;$('dxReturnWrap').style.display=yes?'block':'none';$('dxReturnDateTime').required=yes;}
+function openDxForm(id,dxId=null){
+ const p=people.find(x=>x.id===id);if(!p)return;
+ if(dxId&&!isManager()){alert('Chỉ Quản lý/Admin mới được chỉnh sửa lượt khám.');return;}
+ const d=dxId?(p.khamDotXuat||[]).find(x=>String(x.id)===String(dxId)):null;
+ $('dxPersonId').value=id;$('dxEditId').value=dxId||'';
+ $('dxPersonName').innerHTML=`Đối tượng: <b>${esc(p.ten)}</b> — Mã: <b>${esc(p.ma)}</b>`;
+ $('dxDateTime').value=d?toLocalInputValue(parseDxDate(d.dateTime)||new Date()):toLocalInputValue();
+ $('dxReason').value=d?.reason||'';const dec=decodeDxAction(d?.action||'Theo dõi y tế');
+ $('dxAction').value=dec.base||'Theo dõi y tế';$('dxStayed').checked=dec.stayed;$('dxReturnDateTime').value=dec.returnAt||'';
+ $('dxFormModal').querySelector('h2').textContent=d?'Chỉnh sửa khám đột xuất':'Thêm khám đột xuất';
+ $('dxFormModal').querySelector('button[type="submit"]').textContent=d?'Lưu chỉnh sửa':'Lưu khám';
+ toggleDxReturnField();openModal('dxFormModal');setTimeout(()=>$('dxReason').focus(),100);
 }
 async function saveDxForm(e){
-  e.preventDefault();
-  const id=$('dxPersonId').value;
-  const p=people.find(x=>x.id===id); if(!p)return;
-  const dtLocal=$('dxDateTime').value;
-  const reason=$('dxReason').value.trim();
-  const action=$('dxAction').value;
-  if(!dtLocal||!reason){alert('Vui lòng nhập đầy đủ ngày giờ và lý do khám.');return;}
-  const dt=new Date(dtLocal);
-  const dateTime=dt.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'});
-  try{
-    const r=await api('kham_dot_xuat',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({person_id:id,date_time:dateTime,reason,action})});
-    if(!r.ok)throw new Error(await r.text());
-    closeModal('dxFormModal');
-    await loadDx(); render(); viewPerson(id);
-    alert('Đã lưu khám đột xuất thành công.');
-  }catch(e){showCloudError(e)}
+ e.preventDefault();const id=$('dxPersonId').value,editId=$('dxEditId').value,p=people.find(x=>x.id===id);if(!p)return;
+ if(editId&&!isManager()){alert('Chỉ Quản lý/Admin mới được chỉnh sửa lượt khám.');return;}
+ const dtLocal=$('dxDateTime').value,reason=$('dxReason').value.trim(),stayed=$('dxStayed').checked,returnAt=$('dxReturnDateTime').value;
+ if(!dtLocal||!reason){alert('Vui lòng nhập đầy đủ ngày giờ và lý do khám.');return;}
+ if(stayed&&!returnAt){alert('Vui lòng ghi ngày giờ trở về khu.');return;}
+ const baseAction=$('dxAction').value;
+ const dateTime=new Date(dtLocal).toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}),action=encodeDxAction(baseAction,stayed,returnAt);
+ try{
+   let r;
+   if(editId){r=await api('kham_dot_xuat?id=eq.'+encodeURIComponent(editId),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({date_time:dateTime,reason,action})});}
+   else{r=await api('kham_dot_xuat',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({person_id:id,date_time:dateTime,reason,action})});}
+   if(!r.ok)throw new Error(await r.text());
+   // Không ghi lại bảng hồ sơ chính khi lưu khám: tài khoản chưa đăng nhập chỉ được INSERT lượt khám,
+   // tuyệt đối không được sửa dữ liệu hồ sơ. Vị trí hiện tại được suy ra từ lượt khám mới nhất khi hiển thị.
+   closeModal('dxFormModal');await loadPeople();viewPerson(id);alert(editId?'Đã cập nhật lượt khám.':'Đã lưu lượt khám. Vị trí Phòng Y tế/Khu được cập nhật theo lượt khám mới nhất.');
+ }catch(err){showCloudError(err)}
+}
+async function deleteDx(dxId,personId=''){
+ if(!isManager()){alert('Chỉ Quản lý/Admin mới được xóa lượt khám đột xuất.');return;}
+ if(!dxId)return;
+ if(!confirm('Bạn có chắc muốn xóa lượt khám đột xuất này? Thao tác này không thể hoàn tác.'))return;
+ try{
+   const r=await api('kham_dot_xuat?id=eq.'+encodeURIComponent(dxId),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+   if(!r.ok)throw new Error(await r.text());
+   await loadPeople();
+   if(personId && people.some(p=>String(p.id)===String(personId)))viewPerson(personId);
+   else if($('dashboardList').style.display!=='none'){
+     const title=$('dashboardListTitle').textContent;
+     showDashboardList(title.includes('tuần này')?'dxweek':'dx');
+   }
+   alert('Đã xóa lượt khám đột xuất.');
+ }catch(err){showCloudError(err)}
 }
 async function addDx(id){openDxForm(id)}
-function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma})));$('dxContent').innerHTML=`<h2>🚨 Thống kê khám đột xuất</h2><div class="notice">Tổng lượt: <b>${all.length}</b></div><div class="dx-list">${all.length?all.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(d.action)}</div>`).join(''):'Chưa có dữ liệu.'}</div>`;openModal('dxModal')}
+function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma})));$('dxContent').innerHTML=`<h2>Thống kê khám đột xuất</h2><div class="notice">Tổng lượt: <b>${all.length}</b></div><div class="dx-list">${all.length?all.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Ch?a có d? li?u.'}</div>`;openModal('dxModal')}
+function hideDashboardList(){$('dashboardList').style.display='none';}
+function showDashboardList(type){
+ let title='',html='';
+ if(['all','Khu','Phòng Y tế','Ph·ng Y t?','Bệnh viện'].includes(type)){
+  title=type==='all'?'Tất cả đối tượng':`Danh sách: ${type==='Ph·ng Y t?'?'Phòng Y tế':type}`;const normalizedType=type==='Ph·ng Y t?'?'Phòng Y tế':type;const list=type==='all'?people:people.filter(p=>currentLocation(p)===normalizedType);
+  html=list.length?list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Vị trí: ${esc(locationText(p))}<br>Tình trạng: ${esc(p.tinhTrang||'—')}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join(''):'Chưa có đối tượng trong mục này.';
+ }else if(type==='med'){
+  title='Danh sách người đang uống thuốc';const list=people.filter(isTakingMedicine);html=list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Thuốc: ${esc(meds(p))}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join('');if(!html)html='Chưa có dữ liệu trong mục này.';
+ }else{
+  title=type==='dxweek'?'Danh sách khám đột xuất tuần này':'Danh sách khám đột xuất';const list=type==='dxweek'?weeklyDx():people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma,personId:p.id})));
+  html=list.map(d=>`<div class="dx-item"><b>${esc(d.dateTime||'')}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}<br><button class="btn gray" onclick="viewPerson('${d.personId||''}')">Xem hồ sơ</button>${isManager()&&d.id?` <button class="btn blue" onclick="openDxForm('${d.personId||''}','${d.id}')">Sửa lượt khám</button> <button class="btn red" onclick="deleteDx('${d.id}','${d.personId||''}')">Xóa lượt khám</button>`:''}</div>`).join('');if(!html)html='Chưa có dữ liệu trong mục này.';
+ }
+ $('dashboardListTitle').textContent=title;$('dashboardListBody').innerHTML=html;$('dashboardList').style.display='grid';$('dashboardList').scrollIntoView({behavior:'smooth',block:'start'});
+}
 function setLocationFilter(v){$('filterLocation').value=v;render()}
 function exportData(){let blob=new Blob([JSON.stringify(people,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BTXH_Tan_Hiep_backup.json';a.click();URL.revokeObjectURL(a.href)}
-function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao lưu không hợp lệ.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi phục dữ liệu thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
+function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao l?u không h?p l?.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi ph?c d? li?u thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
 window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
 restoreSession();loadPeople();
 </script>
