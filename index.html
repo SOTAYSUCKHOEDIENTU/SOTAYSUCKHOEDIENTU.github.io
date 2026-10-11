@@ -202,12 +202,12 @@ async function login(e){
     localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
     closeModal('loginModal'); $('loginPassword').value=''; updateAuthUI(); render();
     alert('đăng nhập quản lý thành công.');
-  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\nKiểm tra email và mật khẩu tài kho?n quản lý trong Supabase.')}
+  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\nKiểm tra email và mật khẩu tài khoản quản lý trong Supabase.')}
 }
 function logout(){managerSession=null;localStorage.removeItem(SESSION_KEY);updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.')}
 function openLogin(){openModal('loginModal')}
 
-function showCloudError(err){console.error(err);alert('Không thể thực hiện được thao tác v?i Supabase.\n\n'+(err?.message||err));}
+function showCloudError(err){console.error(err);alert('Không thể thực hiện được thao tác với Supabase.\n\n'+(err?.message||err));}
 
 async function loadPeople(){
   try{
@@ -230,7 +230,7 @@ function resetPersonForm(){
   $('personForm').reset();$('editId').value='';photoData='';$('preview').src='';$('coCccd').value='Không';$('cccd').value='';toggleCccd();$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
 }
 function openPerson(id=null){
-  if(!isManager()){if(id)viewPerson(id);else alert('Bạn cần đăng nhập Qu?n lý ?? thêm đối tượng.');return;}
+  if(!isManager()){if(id)viewPerson(id);else alert('Bạn cần đăng nhập Quản lý để thêm đối tượng.');return;}
   resetPersonForm();
   if(id){
     const p=people.find(x=>x.id===id);if(!p)return;
@@ -241,7 +241,7 @@ function openPerson(id=null){
   openModal('personModal');
 }
 async function savePerson(e){
-  e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Qu?n lý.');return;}
+  e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
   const id=$('editId').value||uid();
   const old=people.find(p=>p.id===id);
   const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),tinhTrang:$('tinhTrang').value.trim(),trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',updated:new Date().toISOString()};
@@ -254,7 +254,7 @@ async function savePerson(e){
   }catch(err){showCloudError(err)}
 }
 async function delPerson(id){
-  if(!isManager()){alert('Bạn cần đăng nhập Qu?n lý.');return;}
+  if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
   const p=people.find(x=>x.id===id);if(!p)return;if(!confirm('Xóa đối tượng '+p.ten+'?'))return;
   try{const r=await api('so_tay_suc_khoe?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});if(!r.ok)throw new Error(await r.text());await loadPeople();}catch(err){showCloudError(err)}
 }
@@ -288,7 +288,7 @@ function weeklyDx(){
 function openDxWeekly(){
   const list=weeklyDx(); const {start,end}=weekRange();
   $('weeklySummary').innerHTML=`Từ <b>${start.toLocaleDateString('vi-VN')}</b> đến <b>${end.toLocaleDateString('vi-VN')}</b>: <b>${list.length} lượt khám</b>.`;
-  $('weeklyList').innerHTML=list.length?list.map(d=>`<div class="dx-item"><b>${esc(d.dt.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}))}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Ch?a có lượt khám đột xuất trong tu?n này.';
+  $('weeklyList').innerHTML=list.length?list.map(d=>`<div class="dx-item"><b>${esc(d.dt.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}))}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Chưa có lượt khám đột xuất trong tuần này.';
   $('weeklyStats').style.display='grid'; $('weeklyStats').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function render(){
@@ -302,7 +302,7 @@ function render(){
   $('countMed').textContent=people.filter(isTakingMedicine).length;
   $('countDxWeek').textContent=weeklyDx().length;
 
-  // Ẩn toàn bộ thông tin đối tượng khi ch?a nh?p tên.
+  // Ẩn toàn bộ thông tin đối tượng khi chưa nhập tên.
   if(!q){
     $('tbody').innerHTML='';
     $('cards').innerHTML='';
@@ -390,11 +390,18 @@ async function deleteDx(dxId,personId=''){
  }catch(err){showCloudError(err)}
 }
 async function addDx(id){openDxForm(id)}
-function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma})));$('dxContent').innerHTML=`<h2>Thống kê khám đột xuất</h2><div class="notice">Tổng lượt: <b>${all.length}</b></div><div class="dx-list">${all.length?all.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Ch?a có d? li?u.'}</div>`;openModal('dxModal')}
+function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma})));$('dxContent').innerHTML=`<h2>Thống kê khám đột xuất</h2><div class="notice">Tổng lượt: <b>${all.length}</b></div><div class="dx-list">${all.length?all.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}</div>`).join(''):'Chưa có dữ liệu.'}</div>`;openModal('dxModal')}
 function hideDashboardList(){$('dashboardList').style.display='none';}
 function showDashboardList(type){
  let title='',html='';
- if(['all','Khu','Phòng Y tế','Ph·ng Y t?','Bệnh viện'].includes(type)){
+ if(type==='Khu'){
+  title='Danh sách tại Khu — chọn Nhà';
+  const houses=['Nhà 1','Nhà 2','Nhà 3','Nhà 4'];
+  html='<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px">'+houses.map(h=>`<button class="btn blue" onclick="showDashboardList('house:${h}')">${h} — ${people.filter(p=>currentLocation(p)==='Khu'&&String(p.nha||'').trim()===h).length} người</button>`).join('')+'</div><div class="notice">Chọn Nhà 1, Nhà 2, Nhà 3 hoặc Nhà 4 để xem danh sách đối tượng đang ở nhà đó.</div>';
+ }else if(type.startsWith('house:')){
+  const house=type.slice(6); title='Danh sách tại '+house; const list=people.filter(p=>currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+  html='<button class="btn gray" onclick="showDashboardList(\'Khu\')">← Quay lại 4 Nhà</button>'+ (list.length?list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Nhà: ${esc(p.nha||'—')}<br>Vị trí: ${esc(locationText(p))}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join(''):'<div class="notice">Chưa có đối tượng đang ở '+esc(house)+'. Hãy kiểm tra mục Nhà trong hồ sơ đối tượng.</div>');
+ }else if(['all','Phòng Y tế','Ph·ng Y t?','Bệnh viện'].includes(type)){
   title=type==='all'?'Tất cả đối tượng':`Danh sách: ${type==='Ph·ng Y t?'?'Phòng Y tế':type}`;const normalizedType=type==='Ph·ng Y t?'?'Phòng Y tế':type;const list=type==='all'?people:people.filter(p=>currentLocation(p)===normalizedType);
   html=list.length?list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Vị trí: ${esc(locationText(p))}<br>Tình trạng: ${esc(p.tinhTrang||'—')}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join(''):'Chưa có đối tượng trong mục này.';
  }else if(type==='med'){
@@ -407,7 +414,7 @@ function showDashboardList(type){
 }
 function setLocationFilter(v){$('filterLocation').value=v;render()}
 function exportData(){let blob=new Blob([JSON.stringify(people,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BTXH_Tan_Hiep_backup.json';a.click();URL.revokeObjectURL(a.href)}
-function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao l?u không h?p l?.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi ph?c d? li?u thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
+function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao lưu không hợp lệ.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi phục dữ liệu thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
 window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
 restoreSession();loadPeople();
 </script>
