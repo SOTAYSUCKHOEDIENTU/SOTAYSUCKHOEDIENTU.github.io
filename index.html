@@ -273,10 +273,10 @@ async function loadPeople(){
   }catch(e){showCloudError(e)}
 }
 async function loadDx(){
-  const r=await api('kham_dot_xuat?select=id,person_id,date_time,reason,action,created_at&order=created_at.desc');
+  const r=await api('kham_dot_xuat?select=id,doi_tuong_id,ngay_gio,ly_do,huong_xu_ly,created_at&order=created_at.desc');
   if(!r.ok)throw new Error(await r.text());
   const rows=await r.json(); const map={};
-  rows.forEach(d=>(map[d.person_id]??=[]).push({id:d.id,dateTime:d.date_time,reason:d.reason,action:d.action,created_at:d.created_at}));
+  rows.forEach(d=>(map[d.doi_tuong_id]??=[]).push({id:d.id,dateTime:d.ngay_gio,reason:d.ly_do,action:d.huong_xu_ly,created_at:d.created_at}));
   people.forEach(p=>p.khamDotXuat=map[p.id]||[]);
 }
 
@@ -478,8 +478,8 @@ async function saveDxForm(e){
  const dateTime=new Date(dtLocal).toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'}),action=encodeDxAction(baseAction,stayed,returnAt);
  try{
    let r;
-   if(editId){r=await api('kham_dot_xuat?id=eq.'+encodeURIComponent(editId),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({date_time:dateTime,reason,action})});}
-   else{r=await api('kham_dot_xuat',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({person_id:id,date_time:dateTime,reason,action})});}
+   if(editId){r=await api('kham_dot_xuat?id=eq.'+encodeURIComponent(editId),{method:'PATCH',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({ngay_gio:new Date(dtLocal).toISOString(),ly_do:reason,huong_xu_ly:action})});}
+   else{r=await api('kham_dot_xuat',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({doi_tuong_id:id,ngay_gio:new Date(dtLocal).toISOString(),ly_do:reason,huong_xu_ly:action})});}
    if(!r.ok)throw new Error(await r.text());
    // Không ghi lại bảng hồ sơ chính khi lưu khám: tài khoản chưa đăng nhập chỉ được INSERT lượt khám,
    // tuyệt đối không được sửa dữ liệu hồ sơ. Vị trí hiện tại được suy ra từ lượt khám mới nhất khi hiển thị.
