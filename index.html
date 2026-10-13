@@ -260,7 +260,48 @@ function headers(extra={}){
   const token=managerSession?.access_token || SUPABASE_KEY;
   return Object.assign({'apikey':SUPABASE_KEY,'Authorization':'Bearer '+token,'Content-Type':'application/json'},extra);
 }
-function api(path, options={}){return fetch(SUPABASE_URL+'/rest/v1/'+path,Object.assign({headers:headers()},options));}
+let refreshInProgress=null;
+async function refreshSession(force=false){
+  if(!managerSession?.refresh_token)return false;
+  const expiresAt=Number(managerSession.expires_at||0);
+  if(!force && expiresAt && expiresAt>Date.now()/1000+60)return true;
+  if(refreshInProgress)return refreshInProgress;
+  refreshInProgress=(async()=>{
+    try{
+      const r=await authApi('token?grant_type=refresh_token',{
+        method:'POST',
+        body:JSON.stringify({refresh_token:managerSession.refresh_token})
+      });
+      if(!r.ok)throw new Error(await r.text());
+      const fresh=await r.json();
+      if(!fresh?.access_token)throw new Error('Supabase không trả về access token mới.');
+      managerSession=Object.assign({},managerSession,fresh);
+      localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
+      updateAuthUI();
+      return true;
+    }catch(err){
+      console.warn('Không thể làm mới phiên đăng nhập Supabase:',err);
+      managerSession=null;
+      localStorage.removeItem(SESSION_KEY);
+      updateAuthUI();
+      return false;
+    }finally{refreshInProgress=null;}
+  })();
+  return refreshInProgress;
+}
+async function api(path, options={}){
+  // Làm mới token trước khi hết hạn; nếu Supabase trả 401 thì làm mới và thử lại một lần.
+  if(managerSession?.refresh_token)await refreshSession(false);
+  const send=()=>fetch(SUPABASE_URL+'/rest/v1/'+path,Object.assign({},options,{
+    headers:Object.assign({},options.headers||{},headers())
+  }));
+  let response=await send();
+  if(response.status===401 && managerSession?.refresh_token){
+    const refreshed=await refreshSession(true);
+    if(refreshed)response=await send();
+  }
+  return response;
+}
 function authApi(path, options={}){return fetch(SUPABASE_URL+'/auth/v1/'+path,Object.assign({headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'}},options));}
 function getUserRole(){
   const u=managerSession?.user||{}, app=u.app_metadata||{}, meta=u.user_metadata||{};
@@ -312,7 +353,7 @@ function updateAuthUI(){
   document.querySelectorAll('.manager-only').forEach(x=>x.style.display=isAdmin()?'inline-block':'none');
   const importInput=$('importFile'); if(importInput) importInput.style.display='none';
 }
-function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI()}
+function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI();if(managerSession?.refresh_token)refreshSession(false)}
 function toggleLoginHouse(){
   const isHouse=$('loginRoleType')?.value==='house';
   if($('loginHouseWrap'))$('loginHouseWrap').style.display=isHouse?'block':'none';
