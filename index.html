@@ -10,6 +10,11 @@
 body{margin:0;background:var(--bg);color:#333;padding:12px}.container{max-width:1400px;margin:auto}
 h1{text-align:center;color:var(--primary);margin:8px 0 2px;padding-bottom:4px;border:0;font-size:clamp(10px,2.7vw,30px);line-height:1.2;white-space:nowrap;letter-spacing:-.35px}
 .institution{text-align:center;font-weight:700;color:#526170;margin:0 0 22px;font-size:clamp(14px,2vw,18px)}
+.header-account{display:flex;justify-content:flex-start;align-items:center;margin:-8px 2px 8px;position:relative;z-index:2}
+.account-pill{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 8px;border:1px solid #d3dbe3;border-radius:28px;background:#fff;color:#263746;box-shadow:0 2px 7px #0000000b;min-height:54px;font-weight:700}
+.account-avatar{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;background:linear-gradient(135deg,#dcecf7,#b8d3e6);font-size:23px;flex-shrink:0}
+.account-label{font-size:14px;white-space:nowrap}
+@media(max-width:700px){.header-account{margin:-8px 2px 8px}.account-pill{min-height:48px;padding:5px 12px 5px 6px}.account-avatar{width:34px;height:34px;font-size:21px}}
 .nav-subtitle{display:block;font-size:12px;margin-top:4px;opacity:.85}.home-layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:stretch;margin:18px 0 22px}.home-nav.total-nav{grid-column:1/-1;min-height:125px;border-color:#b65f6d;color:#9b4051}.home-nav.total-nav .nav-caption{font-size:clamp(18px,2.5vw,26px)}.home-nav.total-nav .nav-count{font-size:clamp(38px,5vw,54px)}
 .home-total{background:#fff;border:2px solid #b65f6d;border-radius:14px;min-height:150px;padding:18px 12px;text-align:center;display:flex;flex-direction:column;justify-content:center;box-shadow:0 3px 10px #0000000d}
 .home-total small{font-weight:700;color:#7c3f4a;font-size:15px}.home-total strong{font-size:38px;color:#9b4051;margin:7px 0}.home-total span{font-size:12px;color:#6b7280}
@@ -60,12 +65,20 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 .census-mini{background:#eef3f7;border:1px solid #e0e8ee}.census-mini b{color:#2c526b}
 .census-person{background:#fff;border-color:#dce5ec;box-shadow:0 2px 6px #20394b08}
 
+
+/* Thuc don hom nay */
+.meal-update-notice{background:#fff7df;border:1px solid #f1d27b;border-left:5px solid #d99b17;border-radius:9px;padding:10px 13px;margin:-7px 0 15px;color:#704f08;font-weight:700;box-shadow:0 2px 6px #00000008}.meal-update-notice small{display:block;font-weight:400;margin-top:3px;color:#7c6a3e}
+
+.meal-card{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#f0fbf3,#dff4e5);border:1px solid #a9d9b6;border-left:5px solid #27ae60;border-radius:12px;padding:14px 16px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
+.meal-card h2{margin:0 0 4px;color:#216e39;font-size:20px}.meal-card p{margin:0;color:#4c6653;font-size:13px}.meal-actions{display:flex;gap:8px;flex-wrap:wrap}.meal-file-link{display:inline-block;max-width:100%;overflow-wrap:anywhere;margin-top:8px;font-weight:700;color:#216e39}
+.meal-preview{max-width:100%;max-height:55vh;object-fit:contain;border:1px solid #d8e5dc;border-radius:8px;background:#f8faf9}.meal-status{margin-top:10px;padding:10px;background:#f5faf6;border-radius:8px}
 </style>
 <link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#2c3e50"></head>
 <body>
 <div class="container">
 <h1>THEO DÕI QUÂN SỐ – DIỄN BIẾN TẠI KHU</h1>
 <div class="institution">TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</div>
+<div class="header-account"><button id="loginBtn" class="account-pill" onclick="openLogin()"><span class="account-avatar" aria-hidden="true">👤</span><span class="account-label">Trang chủ</span></button><button id="accountMenuBtn" class="account-pill" style="display:none" onclick="openAccountMenu()"><span class="account-avatar" aria-hidden="true">👤</span><span class="account-label">Trang chủ ▾</span></button></div>
 <div class="home-layout">
   <div class="home-nav total-nav"><span class="nav-caption">TỔNG QUÂN SỐ</span><strong class="nav-count" id="homeCountTotal">0</strong><span class="nav-subtitle" id="totalBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</span></div>
   <button class="home-nav khu-nav" onclick="showKhuPanel()"><span class="nav-caption">KHU</span><strong class="nav-count" id="homeCountKhu">0</strong><div class="khu-zone-summary" aria-label="Quân số theo khu"><span><b>Khu I</b><strong id="homeZoneElderly">0</strong><small id="homeZoneElderlyBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</small></span><span><b>Khu II</b><strong id="homeZoneHomeless">0</strong><small id="homeZoneHomelessBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</small></span><span><b>Khu III</b><strong id="homeZoneMental">0</strong><small id="homeZoneMentalBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</small></span></div></button>
@@ -73,7 +86,6 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
   <button class="home-nav bv-nav" onclick="showDashboardList('Bệnh viện')"><span class="nav-caption">BỆNH VIỆN</span><strong class="nav-count" id="homeCountBv">0</strong><span class="nav-subtitle" id="bvBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</span></button>
 </div>
 <div class="home-actions">
-  <button id="loginBtn" class="btn dark" onclick="openLogin()">Quản lý</button>
   <button class="btn green manager-only" style="display:none" onclick="openPerson()">＋ Thêm đối tượng</button>
   <input id="search" class="search" placeholder="Tìm theo tên đối tượng..." oninput="render()">
 </div>
@@ -111,8 +123,22 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div id="loginModal" class="modal">
 <div class="box" style="max-width:430px">
 <button class="close" onclick="closeModal('loginModal')">×</button>
-<h2>Đăng nhập Quản lý</h2>
+<h2>☰ Menu</h2>
+<div style="margin:12px 0 16px"><button type="button" class="btn green" style="width:100%;min-height:46px" onclick="openMealModal()">🍲 Thực đơn hôm nay</button></div>
 <p class="notice">Tài khoản này dùng để thêm, sửa và xóa hồ sơ. Nhân viên bình thường không cần đăng nhập.</p>
+<div id="accountStatus" class="notice" style="display:none"></div><div id="accountAdminArea" style="display:none;margin:10px 0"><button type="button" class="btn dark" onclick="openAdminAccountInfo()">⚙️ Quản lý tài khoản</button></div>
+<div id="loginRoleChooser" class="field" style="margin:12px 0">
+<label>Chọn loại tài khoản</label>
+<select id="loginRoleType" onchange="toggleLoginHouse()">
+<option value="admin">Tài khoản quản lý (ADMIN)</option>
+<option value="house">Tài khoản nhà</option>
+<option value="yte">Tài khoản Y tế</option>
+</select>
+</div>
+<div id="loginHouseWrap" class="field" style="display:none;margin:10px 0">
+<label>Chọn nhà được cấp quyền</label>
+<select id="loginHouse"><option value="">-- Chọn nhà --</option><option>Nhà 1</option><option>Nhà 2</option><option>Nhà 3</option><option>Nhà 4</option><option>Nhà 5</option><option>Nhà 6</option><option>Nhà 7</option><option>Nhà 8</option><option>Nhà 9</option><option>Nhà 10</option><option>Nhà 11</option></select>
+</div>
 <form onsubmit="login(event)">
 <div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username"></div>
 <div class="field" style="margin-top:10px"><label>Mật khẩu</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
@@ -210,6 +236,16 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div id="detailModal" class="modal"><div class="box"><button class="close" onclick="closeModal('detailModal')">×</button><div id="detail"></div></div></div>
 <div id="dxModal" class="modal"><div class="box"><button class="close" onclick="closeModal('dxModal')">×</button><div id="dxContent"></div></div></div>
 
+<div id="mealModal" class="modal"><div class="box" style="max-width:700px">
+<button class="close" onclick="closeModal('mealModal')">×</button><h2>🍲 Thực đơn hôm nay</h2>
+<div id="mealViewer" class="meal-status"></div>
+<div id="mealUploadArea" style="display:none;margin-top:14px">
+<div class="field"><label>Chọn file thực đơn (PDF, ảnh, Word hoặc Excel)</label><input id="mealFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.doc,.docx,.xls,.xlsx,application/pdf,image/*,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></div>
+<p style="font-size:12px;color:#666">Lưu ý: bản hiện tại lưu file trên trình duyệt/thiết bị đang dùng. Để mọi tài khoản xem chung trên điện thoại và máy tính, cần kết nối kho lưu trữ dùng chung trên Supabase.</p>
+<div class="actions"><button class="btn gray" onclick="closeModal('mealModal')">Đóng</button><button class="btn green" onclick="saveMealFile()">Lưu thực đơn hôm nay</button></div>
+</div><div class="actions" id="mealViewerActions"><button type="button" class="btn blue" onclick="openMealUpload()">＋ Tải thực đơn lên</button><button class="btn gray" onclick="closeModal('mealModal')">Đóng</button></div>
+</div></div>
+
 <script>
 /* ================= SUPABASE ================= */
 const SUPABASE_URL = 'https://izsvbljotokmfuknvhcz.supabase.co';
@@ -226,7 +262,37 @@ function headers(extra={}){
 }
 function api(path, options={}){return fetch(SUPABASE_URL+'/rest/v1/'+path,Object.assign({headers:headers()},options));}
 function authApi(path, options={}){return fetch(SUPABASE_URL+'/auth/v1/'+path,Object.assign({headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'}},options));}
-function isManager(){return !!managerSession?.access_token;}
+function getUserRole(){
+  const u=managerSession?.user||{}, app=u.app_metadata||{}, meta=u.user_metadata||{};
+  return String(app.role||meta.role||meta.vai_tro||'viewer').toLowerCase();
+}
+function getAssignedHouse(){
+  const u=managerSession?.user||{}, meta=u.user_metadata||{}, app=u.app_metadata||{};
+  return String(app.house||app.nha||meta.house||meta.nha||'').trim();
+}
+function isAdmin(){return !!managerSession?.access_token && ['admin','administrator','quan_tri','quản trị'].includes(getUserRole());}
+function isManager(){return !!managerSession?.access_token && (isAdmin() || ['manager','quan_ly','quản lý','house_manager','y_te','medical'].includes(getUserRole()));}
+function canManagePerson(p){
+  if(!isManager())return false;
+  if(isAdmin())return true;
+  const role=getUserRole(), house=getAssignedHouse();
+  if(['y_te','medical'].includes(role))return ['Phòng Y tế','Bệnh viện'].includes(currentLocation(p));
+  return !!house && String(p?.nha||'').trim()===house;
+}
+function openAccountMenu(){
+  if(!managerSession){openLogin();return;}
+  const role=isAdmin()?'ADMIN – Toàn quyền':(['y_te','medical'].includes(getUserRole())?'Tài khoản Y tế':'Tài khoản phụ trách '+(getAssignedHouse()||'chưa gán nhà'));
+  $('accountStatus').style.display='block';
+  $('accountStatus').innerHTML='Đã đăng nhập: <b>'+esc(managerSession.user?.email||'Tài khoản')+'</b><br>Quyền: <b>'+esc(role)+'</b>';
+  $('accountAdminArea').style.display=isAdmin()?'block':'none';
+  $('loginModal').querySelector('h2').textContent='Trang chủ';
+  $('loginRoleChooser').style.display='none';$('loginHouseWrap').style.display='none';
+  $('loginModal').querySelector('.notice').style.display='none';
+  $('loginModal').querySelector('form').style.display='none';
+  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Đóng</button><button type="button" class="btn red" onclick="logout();closeModal(\'loginModal\')">Đăng xuất</button>';
+  openModal('loginModal');
+}
+function openAdminAccountInfo(){alert('Mục quản lý đã được đưa vào Tài khoản. Để tạo tài khoản và áp dụng phân quyền an toàn, cần cấu hình bảng quyền và chính sách RLS trên Supabase.');}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function openModal(id='personModal'){ $(id).classList.add('show') }
 function closeModal(id){$(id).classList.remove('show')}
@@ -240,26 +306,60 @@ function previewPhoto(e){let f=e.target.files[0];if(!f)return;let r=new FileRead
 function updateAuthUI(){
   const m=isManager();
   $('loginBtn').style.display=m?'none':'inline-block';
-  $('logoutBtn').style.display=m?'inline-block':'none';
+  $('accountMenuBtn').style.display=m?'inline-block':'none';
+  $('logoutBtn').style.display='none';
   const notice=$('authNotice'); if(notice) notice.style.display='none';
-  document.querySelectorAll('.manager-only').forEach(x=>x.style.display=m?'inline-block':'none');
+  document.querySelectorAll('.manager-only').forEach(x=>x.style.display=isAdmin()?'inline-block':'none');
   const importInput=$('importFile'); if(importInput) importInput.style.display='none';
 }
 function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI()}
+function toggleLoginHouse(){
+  const isHouse=$('loginRoleType')?.value==='house';
+  if($('loginHouseWrap'))$('loginHouseWrap').style.display=isHouse?'block':'none';
+}
 async function login(e){
   e.preventDefault();
+  const wanted=$('loginRoleType')?.value||'admin';
+  const chosenHouse=$('loginHouse')?.value||'';
+  if(wanted==='house'&&!chosenHouse){alert('Vui lòng chọn Nhà 1–11.');return;}
   try{
     const r=await authApi('token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('loginEmail').value.trim(),password:$('loginPassword').value})});
     if(!r.ok)throw new Error(await r.text());
-    managerSession=await r.json();
+    const session=await r.json();
+    const app=session.user?.app_metadata||{}, meta=session.user?.user_metadata||{};
+    const role=String(app.role||meta.role||meta.vai_tro||'viewer').toLowerCase();
+    const house=String(app.house||app.nha||meta.house||meta.nha||'').trim();
+    const admin=['admin','administrator','quan_tri','quản trị'].includes(role);
+    const medical=['y_te','medical'].includes(role);
+    const houseRole=['manager','quan_ly','quản lý','house_manager','nhan_vien_nha'].includes(role);
+    if(wanted==='admin'&&!admin){throw new Error('Tài khoản này không được cấp quyền ADMIN.');}
+    if(wanted==='yte'&&!medical){throw new Error('Tài khoản này chưa được cấp quyền Y tế.');}
+    if(wanted==='house'&&(!houseRole||house!==chosenHouse)){throw new Error('Tài khoản chưa được cấp quyền cho '+chosenHouse+'.');}
+    managerSession=session;
     localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
     closeModal('loginModal'); $('loginPassword').value=''; updateAuthUI(); render();
-    alert('đăng nhập quản lý thành công.');
-  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\nKiểm tra email và mật khẩu tài khoản quản lý trong Supabase.')}
+    alert('Đăng nhập thành công.');
+  }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\n'+(err.message||'Kiểm tra tài khoản, mật khẩu và quyền được cấp trong Supabase.'))}
 }
-function logout(){managerSession=null;localStorage.removeItem(SESSION_KEY);updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.')}
-function openLogin(){openModal('loginModal')}
-
+function logout(){
+  managerSession=null;localStorage.removeItem(SESSION_KEY);
+  $('loginModal').querySelector('form').style.display='block';
+  $('loginModal').querySelector('h2').textContent='Trang chủ – Chọn tài khoản đăng nhập';
+  $('loginModal').querySelector('.notice').style.display='block';
+  $('loginRoleChooser').style.display='block';toggleLoginHouse();
+  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Hủy</button><button class="btn green">Đăng nhập</button>';
+  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.');
+}
+function openLogin(){
+  $('loginModal').querySelector('h2').textContent='Trang chủ – Chọn tài khoản đăng nhập';
+  $('loginModal').querySelector('form').style.display='block';
+  $('loginRoleChooser').style.display='block';
+  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';
+  $('loginModal').querySelector('.notice').textContent='Chọn đúng loại tài khoản và nhà được cấp quyền trước khi đăng nhập.';
+  $('loginModal').querySelector('.notice').style.display='block';
+  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Hủy</button><button class="btn green">Đăng nhập</button>';
+  toggleLoginHouse();openModal('loginModal');
+}
 function showCloudError(err){console.error(err);alert('Không thể thực hiện được thao tác với Supabase.\n\n'+(err?.message||err));}
 
 async function loadPeople(){
@@ -284,7 +384,7 @@ function resetPersonForm(){
   $('personForm').reset();$('editId').value='';photoData='';$('preview').src='';$('coCccd').value='Không';$('cccd').value='';toggleCccd();toggleOtherDisease();$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
 }
 function openPerson(id=null){
-  if(!isManager()){if(id)viewPerson(id);else alert('Bạn cần đăng nhập Quản lý để thêm đối tượng.');return;}
+  if(!isManager() || (id && !canManagePerson(people.find(x=>x.id===id)))){if(id)viewPerson(id);else alert('Bạn không có quyền thêm hồ sơ.');return;}
   resetPersonForm();
   if(id){
     const p=people.find(x=>x.id===id);if(!p)return;
@@ -295,8 +395,8 @@ function openPerson(id=null){
   openModal('personModal');
 }
 async function savePerson(e){
-  e.preventDefault();if($('vitri').value==='Bệnh viện'&&!$('bvInfo').value.trim()){alert('Vui lòng nhập tên bệnh viện.');$('bvInfo').focus();return;}if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
-  const id=$('editId').value||uid();
+  e.preventDefault();if($('vitri').value==='Bệnh viện'&&!$('bvInfo').value.trim()){alert('Vui lòng nhập tên bệnh viện.');$('bvInfo').focus();return;}if(!isManager()){alert('Bạn không có quyền quản lý hồ sơ.');return;}
+  const editingId=$('editId').value;if(editingId&&!canManagePerson(people.find(x=>x.id===editingId))){alert('Bạn chỉ được quản lý hồ sơ thuộc phạm vi được giao.');return;}const id=editingId||uid();
   const old=people.find(p=>p.id===id);
   const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,gioitinh:$('gioitinh').value,khuyettat:$('khuyettat').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),ngayTaiKham:$('ngayTaiKham').value,khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),tinhTrang:$('tinhTrang').value.trim(),ghiChuChuyen:old?.ghiChuChuyen||'',trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',locationHistory:old?.locationHistory||[],readmissionHistory:old?.readmissionHistory||[],updated:new Date().toISOString()};
   const reactivated=!!old&&(old.trangthai==='Hồi gia'||old.trangthai==='Tử vong'||old.trangthai==='Chuyển đi nơi khác')&&p.trangthai==='Đang quản lý';
@@ -405,9 +505,9 @@ function render(){
     (fl==='all'||(p.trangthai||'Đang quản lý')!=='Đang quản lý'||currentLocation(p)===fl)
   );
 
-  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${currentLocation(p)==='Khu'?'khu':currentLocation(p)==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
+  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${currentLocation(p)==='Khu'?'khu':currentLocation(p)==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${canManagePerson(p)?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
 
-  $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${isManager()?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}</div>`).join('');
+  $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${canManagePerson(p)?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}</div>`).join('');
 
   $('empty').textContent=arr.length?'':'Không tìm thấy đối tượng phù hợp.';
   $('empty').style.display=arr.length?'none':'block';
@@ -706,8 +806,17 @@ function showDashboardList(type){
 function setLocationFilter(v){$('filterLocation').value=v;render()}
 function exportData(){let blob=new Blob([JSON.stringify(people,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BTXH_Tan_Hiep_backup.json';a.click();URL.revokeObjectURL(a.href)}
 function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao lưu không hợp lệ.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi phục dữ liệu thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
+const MEAL_STORAGE_KEY='btxh_meal_today_v1';
+function todayLocalKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function readMeal(){try{const item=JSON.parse(localStorage.getItem(MEAL_STORAGE_KEY)||'null');if(!item||item.date!==todayLocalKey()){if(item)localStorage.removeItem(MEAL_STORAGE_KEY);return null}return item}catch(e){return null}}
+function renderMeal(){const item=readMeal();const dateLabel=$('mealDateLabel'),info=$('mealCurrentInfo'),notice=$('mealUpdateNotice');if(dateLabel)dateLabel.textContent='Ngày '+new Date().toLocaleDateString('vi-VN')+' · Chỉ hiển thị trong ngày hiện tại';if(!info)return;if(!item){info.textContent='Chưa có thực đơn hôm nay.';if(notice)notice.style.display='none';return}info.innerHTML='Đã tải lên: '+esc(item.name||'Thực đơn')+' <span style="font-weight:400">('+esc(item.sizeLabel||'file')+')</span>';if(notice){notice.innerHTML='📢 Thực đơn hôm nay đã được cập nhật!<small>'+esc(item.name||'Thực đơn')+' · Thời gian cập nhật: '+esc(item.uploadedAt||'')+'</small>';notice.style.display='block'}}
+window.addEventListener('storage',function(e){if(e.key===MEAL_STORAGE_KEY){renderMeal();}});
+function openMealModal(){renderMeal();$('mealUploadArea').style.display='none';$('mealViewerActions').style.display='flex';const item=readMeal();const viewer=$('mealViewer');if(!item){viewer.innerHTML=''}else{const isImage=/^image\//.test(item.type||'');viewer.innerHTML='<div><b>'+esc(item.name)+'</b>'+(isImage?'<div style="margin-top:10px"><img class="meal-preview" src="'+item.data+'" alt="Thực đơn hôm nay"></div>':'')+'</div>';if(!isImage){$('mealViewerActions').insertAdjacentHTML('afterbegin','<button type="button" class="btn blue" onclick="openMealFile()">Mở file thực đơn</button>')}}openModal('mealModal')}
+function openMealUpload(){openMealModal();$('mealUploadArea').style.display='block';$('mealViewerActions').style.display='none'}
+function saveMealFile(){const file=$('mealFile').files[0];if(!file){alert('Vui lòng chọn file thực đơn.');return}if(file.size>4*1024*1024){alert('File lớn hơn 4 MB. Vui lòng chọn file nhỏ hơn để lưu trên trình duyệt.');return}const reader=new FileReader();reader.onload=()=>{try{const item={date:todayLocalKey(),name:file.name,type:file.type||'application/octet-stream',sizeLabel:(file.size/1024).toFixed(0)+' KB',uploadedAt:new Date().toLocaleString('vi-VN'),data:reader.result};localStorage.setItem(MEAL_STORAGE_KEY,JSON.stringify(item));$('mealFile').value='';renderMeal();openMealModal();alert('Đã cập nhật thực đơn hôm nay trên thiết bị này. Thông báo cập nhật đã hiển thị trên giao diện phần mềm. Lưu ý: thiết bị khác chưa nhận được thông báo nếu chưa dùng kho lưu trữ chung.')}catch(err){alert('Không lưu được file trên trình duyệt. Vui lòng chọn file nhỏ hơn.')}};reader.readAsDataURL(file)}
+function openMealFile(){const item=readMeal();if(!item)return;const a=document.createElement('a');a.href=item.data;a.download=item.name||'thuc_don_hom_nay';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
-restoreSession();loadPeople();
+toggleLoginHouse();restoreSession();renderMeal();loadPeople();
 </script>
 <script>if("serviceWorker" in navigator && location.protocol !== "file:"){navigator.serviceWorker.register("./sw.js").catch(()=>{});}</script>
 </body>
