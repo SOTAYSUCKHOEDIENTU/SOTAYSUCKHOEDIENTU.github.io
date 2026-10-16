@@ -162,7 +162,7 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <select id="loginHouse"><option value="">-- Chọn nhà --</option><option>Nhà 1</option><option>Nhà 2</option><option>Nhà 3</option><option>Nhà 4</option><option>Nhà 5</option><option>Nhà 6</option><option>Nhà 7</option><option>Nhà 8</option><option>Nhà 9</option><option>Nhà 10</option><option>Nhà 11</option></select>
 </div>
 <form onsubmit="login(event)">
-<div class="field"><label>Email</label><input id="loginEmail" type="email" required autocomplete="username"></div>
+<div class="field"><label>Tên đăng nhập</label><input id="loginUsername" type="text" required autocomplete="username" placeholder="Ví dụ: ADMIN, Nhà 1, Y tế" autocapitalize="off" spellcheck="false"></div>
 <div class="field" style="margin-top:10px"><label>Mật khẩu</label><input id="loginPassword" type="password" required autocomplete="current-password"></div>
 <div class="actions"><button type="button" class="btn gray" onclick="closeModal('loginModal')">Hủy</button><button class="btn green">Đăng nhập</button></div>
 </form>
@@ -282,6 +282,22 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 </div><div class="actions" id="mealViewerActions"><button type="button" class="btn blue" onclick="openMealUpload()">＋ Tải thực đơn lên</button><button class="btn gray" onclick="closeModal('mealModal')">Đóng</button></div>
 </div></div>
 
+<div id="adminAccountsModal" class="modal"><div class="box" style="max-width:900px">
+<button class="close" type="button" onclick="closeModal('adminAccountsModal')">×</button>
+<h2>⚙️ Quản lý tài khoản</h2>
+<p class="notice">Chỉ ADMIN được tạo, đặt lại mật khẩu và khóa/mở tài khoản. Tên đăng nhập dùng trực tiếp, không cần nhập email.</p>
+<form id="createAccountForm" onsubmit="createManagedAccount(event)" style="border:1px solid #dce5ec;border-radius:9px;padding:12px;margin-bottom:16px">
+<div class="section">Tạo tài khoản mới</div><div class="grid">
+<div class="field"><label>Tên đăng nhập *</label><input id="newAccountUsername" required placeholder="Ví dụ: Nhà 1, Nhà 2, Y tế" autocomplete="off"></div>
+<div class="field"><label>Mật khẩu ban đầu * (ít nhất 8 ký tự)</label><input id="newAccountPassword" type="password" minlength="8" required autocomplete="new-password"></div>
+<div class="field"><label>Loại tài khoản *</label><select id="newAccountRole" onchange="toggleNewAccountScope()"><option value="nguoi_dung">Tài khoản nhà</option><option value="y_te">Tài khoản Y tế</option><option value="admin">ADMIN</option></select></div>
+<div class="field"><label>Nhà / phạm vi *</label><select id="newAccountScope"><option>Nhà 1</option><option>Nhà 2</option><option>Nhà 3</option><option>Nhà 4</option><option>Nhà 5</option><option>Nhà 6</option><option>Nhà 7</option><option>Nhà 8</option><option>Nhà 9</option><option>Nhà 10</option><option>Nhà 11</option><option>Y tế</option></select></div>
+<div class="field full"><label>Tên người quản lý (không bắt buộc)</label><input id="newAccountName" placeholder="Tên hiển thị của người sử dụng"></div>
+</div><div class="actions"><button class="btn green" type="submit">＋ Tạo tài khoản</button></div></form>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><h3 style="margin:4px 0">Danh sách tài khoản</h3><button type="button" class="btn blue" onclick="loadManagedAccounts()">↻ Tải lại</button></div>
+<div id="managedAccountsList" class="dx-list" style="margin-top:10px"><p>Nhấn “Tải lại” để xem tài khoản.</p></div>
+</div></div>
+
 <div id="passwordModal" class="modal"><div class="box" style="max-width:460px">
 <button class="close" type="button" onclick="closeModal('passwordModal')">×</button>
 <h2>🔐 Đổi mật khẩu</h2>
@@ -374,7 +390,7 @@ function canManagePerson(p){
 async function loadMyPermission(){
   const userId=managerSession?.user?.id;
   if(!userId)throw new Error('Không xác định được tài khoản đăng nhập.');
-  const r=await api('phan_quyen?select=user_id,vai_tro,ho_ten,trang_thai,pham_vi&user_id=eq.'+encodeURIComponent(userId)+'&trang_thai=eq.true&limit=1');
+  const r=await api('phan_quyen?select=user_id,vai_tro,ho_ten,trang_thai,pham_vi,ten_dang_nhap&user_id=eq.'+encodeURIComponent(userId)+'&trang_thai=eq.true&limit=1');
   if(!r.ok)throw new Error('Không đọc được phân quyền Supabase: '+await r.text());
   const rows=await r.json();
   if(!rows.length)throw new Error('Tài khoản chưa được cấp quyền hoặc đang bị khóa trong bảng phan_quyen.');
@@ -385,7 +401,7 @@ function openAccountMenu(){
   if(!managerSession){openLogin();return;}
   const role=isAdmin()?'ADMIN – Toàn quyền':(['y_te','medical'].includes(getUserRole())?'Tài khoản Y tế':'Tài khoản phụ trách '+(getAssignedHouse()||'chưa gán nhà'));
   $('accountStatus').style.display='block';
-  $('accountStatus').innerHTML='Đã đăng nhập: <b>'+esc(managerSession.user?.email||'Tài khoản')+'</b><br>Quyền: <b>'+esc(role)+'</b>';
+  $('accountStatus').innerHTML='Đã đăng nhập: <b>'+esc(managerPermission?.ten_dang_nhap||managerPermission?.ho_ten||'Tài khoản')+'</b><br>Quyền: <b>'+esc(role)+'</b>';
   $('accountAdminArea').style.display=isAdmin()?'block':'none';
   $('loginModal').querySelector('h2').textContent='Trang chủ';
   $('loginRoleChooser').style.display='none';$('loginHouseWrap').style.display='none';
@@ -412,7 +428,87 @@ async function changeOwnPassword(e){
     closeModal('passwordModal');alert('Đổi mật khẩu thành công. Hãy dùng mật khẩu mới cho lần đăng nhập tiếp theo.');
   }catch(err){console.error(err);alert('Không đổi được mật khẩu.\\n\\n'+(err.message||'Vui lòng thử lại.'))}
 }
-function openAdminAccountInfo(){alert('ADMIN: tạo tài khoản, cấp tên đăng nhập, đặt lại mật khẩu và khóa/mở tài khoản cần dịch vụ quản trị phía máy chủ (Supabase Edge Function) được cấu hình trước. Không thể thực hiện an toàn chỉ bằng HTML công khai. Không đưa khóa service_role vào file này. Chức năng đổi mật khẩu của chính tài khoản đã đăng nhập đã được bổ sung.');}
+function openAdminAccountInfo(){
+  if(!isAdmin()){alert('Chỉ ADMIN được quản lý tài khoản.');return;}
+  toggleNewAccountScope();openModal('adminAccountsModal');loadManagedAccounts();
+}
+function toggleNewAccountScope(){
+  const role=$('newAccountRole')?.value,scope=$('newAccountScope');if(!scope)return;
+  if(role==='admin'){scope.value='';scope.disabled=true;scope.required=false;}
+  else if(role==='y_te'){scope.value='Y tế';scope.disabled=true;scope.required=true;}
+  else {scope.disabled=false;scope.required=true;if(scope.value==='Y tế'||!/^Nhà\s+(1[01]|[1-9])$/.test(scope.value))scope.value='Nhà 1';}
+}
+async function accountManagerRequest(payload){
+  if(!managerSession?.access_token)throw new Error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+  const r=await fetch(SUPABASE_URL+'/functions/v1/account-manager',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+managerSession.access_token,'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  const raw=await r.text();let data={};try{data=raw?JSON.parse(raw):{}}catch{data={error:raw}}
+  if(!r.ok||data.error)throw new Error(data.error||data.message||('Máy chủ trả về lỗi '+r.status));return data;
+}
+async function createManagedAccount(e){
+  e.preventDefault();if(!isAdmin()){alert('Chỉ ADMIN được tạo tài khoản.');return;}
+  const role=$('newAccountRole').value,scope=role==='admin'?'':role==='y_te'?'Y tế':$('newAccountScope').value;
+  const username=$('newAccountUsername').value.trim(),password=$('newAccountPassword').value;
+  if(password.length<8){alert('Mật khẩu phải có ít nhất 8 ký tự.');return;}
+  if(role==='nguoi_dung'&&!/^Nhà\s+(1[01]|[1-9])$/.test(scope)){alert('Vui lòng chọn Nhà 1–11.');return;}
+  try{
+    const result=await accountManagerRequest({action:'create',ten_dang_nhap:username,password,vai_tro:role,ho_ten:$('newAccountName').value.trim()||username,pham_vi:scope});
+    $('createAccountForm').reset();toggleNewAccountScope();await loadManagedAccounts();alert(result.message||('Đã tạo tài khoản '+username+' thành công.'));
+  }catch(err){console.error(err);alert('Không tạo được tài khoản.\n\n'+(err.message||err));}
+}
+async function loadManagedAccounts(){
+  const box=$('managedAccountsList');if(!box)return;if(!isAdmin()){box.innerHTML='<p>Chỉ ADMIN được xem danh sách tài khoản.</p>';return;}box.innerHTML='<p>Đang tải danh sách tài khoản…</p>';
+  try{
+    const result=await accountManagerRequest({action:'list'});let rows=Array.isArray(result.accounts)?result.accounts:Array.isArray(result.data)?result.data:Array.isArray(result.users)?result.users:[];
+    if(!rows.length){box.innerHTML='<p>Chưa có tài khoản hoặc máy chủ chưa trả về danh sách. Kiểm tra mục Logs của Edge Function nếu cần.</p>';return;}
+    box.innerHTML=rows.map(a=>{const username=a.ten_dang_nhap||a.username||a.ho_ten||a.email||a.user_id;const role=a.vai_tro||a.role||'';const scope=a.pham_vi||'';const active=a.trang_thai===true||a.active===true;const id=a.user_id||a.id;
+      return '<div class="dx-item"><b>'+esc(username)+'</b> <span class="badge">'+esc(role)+'</span> <span class="badge">'+esc(scope||'Toàn quyền')+'</span><br><small>Trạng thái: '+(active?'Đang hoạt động':'Đã khóa')+'</small><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">'+(id?'<button type="button" class="btn blue" onclick="editManagedAccount('+JSON.stringify(String(id))+','+JSON.stringify(String(username))+','+JSON.stringify(String(a.ho_ten||username))+','+JSON.stringify(String(scope||''))+','+JSON.stringify(String(role||''))+')">Sửa thông tin</button><button type="button" class="btn blue" onclick="resetManagedPassword('+JSON.stringify(String(id))+','+JSON.stringify(String(username))+')">Đặt lại mật khẩu</button><button type="button" class="btn '+(active?'red':'green')+'" onclick="toggleManagedAccount('+JSON.stringify(String(id))+','+(!active)+','+JSON.stringify(String(username))+')">'+(active?'Khóa tài khoản':'Mở tài khoản')+'</button>':'')+'</div></div>';
+    }).join('');
+  }catch(err){console.error(err);box.innerHTML='<div class="notice">Không tải được danh sách: '+esc(err.message||String(err))+'</div>';}
+}
+async function editManagedAccount(userId,username,currentName,currentScope,role){
+  if(!isAdmin())return alert('Chỉ ADMIN được sửa tài khoản.');
+  if(role==='admin')return alert('Không thể sửa thông tin tài khoản ADMIN bằng chức năng này.');
+  const newUsername=prompt('Tên đăng nhập mới:',username);
+  if(newUsername===null)return;
+  const newName=prompt('Tên người quản lý:',currentName);
+  if(newName===null)return;
+  const allowedScopes=role==='y_te'?['Y tế']:['Nhà 1','Nhà 2','Nhà 3','Nhà 4','Nhà 5','Nhà 6','Nhà 7','Nhà 8','Nhà 9','Nhà 10','Nhà 11'];
+  let newScope=currentScope;
+  if(role!=='y_te'){
+    const message='Nhập phạm vi mới chính xác một trong các giá trị sau:\\n'+allowedScopes.join(', ');
+    newScope=prompt(message,currentScope||'Nhà 1');
+    if(newScope===null)return;
+    newScope=newScope.trim();
+    if(!allowedScopes.includes(newScope))return alert('Phạm vi không hợp lệ. Hãy nhập đúng tên Nhà 1–11.');
+  }else{
+    newScope='Y tế';
+  }
+  if(!newUsername.trim())return alert('Tên đăng nhập không được để trống.');
+  if(!newName.trim())return alert('Tên người quản lý không được để trống.');
+  if(!confirm('Cập nhật tài khoản '+username+'?\\nTên đăng nhập mới: '+newUsername.trim()+'\\nTên người quản lý: '+newName.trim()+'\\nPhạm vi: '+newScope))return;
+  try{
+    const result=await accountManagerRequest({
+      action:'edit_account',
+      user_id:userId,
+      ten_dang_nhap:newUsername.trim(),
+      ho_ten:newName.trim(),
+      pham_vi:newScope
+    });
+    await loadManagedAccounts();
+    alert(result.message||'Đã cập nhật tài khoản.');
+  }catch(err){
+    console.error(err);
+    alert('Không sửa được tài khoản.\\n\\n'+(err.message||String(err)));
+  }
+}
+async function resetManagedPassword(userId,username){
+  if(!isAdmin())return alert('Chỉ ADMIN được đặt lại mật khẩu.');const password=prompt('Nhập mật khẩu mới cho '+username+' (ít nhất 8 ký tự):');if(password===null)return;if(password.length<8)return alert('Mật khẩu phải có ít nhất 8 ký tự.');
+  try{const r=await accountManagerRequest({action:'reset_password',user_id:userId,password});alert(r.message||'Đã đặt lại mật khẩu.');}catch(err){alert('Không đặt lại được mật khẩu.\n\n'+(err.message||err));}
+}
+async function toggleManagedAccount(userId,active,username){
+  if(!isAdmin())return alert('Chỉ ADMIN được khóa/mở tài khoản.');if(!confirm((active?'Mở khóa':'Khóa')+' tài khoản '+username+'?'))return;
+  try{const r=await accountManagerRequest({action:'set_status',user_id:userId,trang_thai:active});await loadManagedAccounts();alert(r.message||(active?'Đã mở tài khoản.':'Đã khóa tài khoản.'));}catch(err){alert('Không đổi được trạng thái tài khoản.\n\n'+(err.message||err));}
+}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function openModal(id='personModal'){ $(id).classList.add('show') }
 function closeModal(id){$(id).classList.remove('show')}
@@ -443,9 +539,11 @@ async function login(e){
   const chosenHouse=$('loginHouse')?.value||'';
   if(wanted==='house'&&!chosenHouse){alert('Vui lòng chọn Nhà 1–11.');return;}
   try{
-    const r=await authApi('token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('loginEmail').value.trim(),password:$('loginPassword').value})});
+    const r=await fetch(SUPABASE_URL+'/functions/v1/account-manager',{method:'POST',headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify({action:'login',ten_dang_nhap:$('loginUsername').value.trim(),password:$('loginPassword').value})});
     if(!r.ok)throw new Error(await r.text());
-    const session=await r.json();
+    const result=await r.json();
+    const session=result.session||result;
+    if(!session?.access_token)throw new Error('Máy chủ không trả về phiên đăng nhập hợp lệ.');
     managerSession=session;managerPermission=null;
     const perm=await loadMyPermission();
     const role=String(perm.vai_tro||'').toLowerCase();
@@ -457,7 +555,7 @@ async function login(e){
     if(wanted==='yte'&&!medical)throw new Error('Tài khoản này chưa được cấp phạm vi Y tế trong bảng phan_quyen.');
     if(wanted==='house'&&(!houseRole||scope!==chosenHouse))throw new Error('Tài khoản chưa được cấp quyền cho '+chosenHouse+' trong bảng phan_quyen.');
     localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
-    closeModal('loginModal'); $('loginPassword').value=''; updateAuthUI(); render();
+    closeModal('loginModal'); $('loginPassword').value=''; $('loginUsername').value=''; updateAuthUI(); render();
     alert('Đăng nhập thành công.');
   }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\n'+(err.message||'Kiểm tra tài khoản, mật khẩu và quyền được cấp trong Supabase.'))}
 }
@@ -1110,6 +1208,11 @@ function openMealUpload(){openMealModal();$('mealUploadArea').style.display='blo
 function saveMealFile(){const file=$('mealFile').files[0];if(!file){alert('Vui lòng chọn file thực đơn.');return}if(file.size>4*1024*1024){alert('File lớn hơn 4 MB. Vui lòng chọn file nhỏ hơn để lưu trên trình duyệt.');return}const reader=new FileReader();reader.onload=()=>{try{const item={date:todayLocalKey(),name:file.name,type:file.type||'application/octet-stream',sizeLabel:(file.size/1024).toFixed(0)+' KB',uploadedAt:new Date().toLocaleString('vi-VN'),data:reader.result};localStorage.setItem(MEAL_STORAGE_KEY,JSON.stringify(item));$('mealFile').value='';renderMeal();openMealModal();alert('Đã cập nhật thực đơn hôm nay trên thiết bị này. Thông báo cập nhật đã hiển thị trên giao diện phần mềm. Lưu ý: thiết bị khác chưa nhận được thông báo nếu chưa dùng kho lưu trữ chung.')}catch(err){alert('Không lưu được file trên trình duyệt. Vui lòng chọn file nhỏ hơn.')}};reader.readAsDataURL(file)}
 function openMealFile(){const item=readMeal();if(!item)return;const a=document.createElement('a');a.href=item.data;a.download=item.name||'thuc_don_hom_nay';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
+// Công khai các hàm quản lý tài khoản để nút onclick trong danh sách gọi được ổn định.
+window.resetManagedPassword = resetManagedPassword;
+window.toggleManagedAccount = toggleManagedAccount;
+window.loadManagedAccounts = loadManagedAccounts;
+
 toggleLoginHouse();restoreSession();renderMeal();loadPeople();
 </script>
 <script>if("serviceWorker" in navigator && location.protocol !== "file:"){navigator.serviceWorker.register("./sw.js").catch(()=>{});}</script>
