@@ -72,8 +72,19 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 .meal-card{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#f0fbf3,#dff4e5);border:1px solid #a9d9b6;border-left:5px solid #27ae60;border-radius:12px;padding:14px 16px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
 .meal-card h2{margin:0 0 4px;color:#216e39;font-size:20px}.meal-card p{margin:0;color:#4c6653;font-size:13px}.meal-actions{display:flex;gap:8px;flex-wrap:wrap}.meal-file-link{display:inline-block;max-width:100%;overflow-wrap:anywhere;margin-top:8px;font-weight:700;color:#216e39}
 .meal-preview{max-width:100%;max-height:55vh;object-fit:contain;border:1px solid #d8e5dc;border-radius:8px;background:#f8faf9}.meal-status{margin-top:10px;padding:10px;background:#f5faf6;border-radius:8px}
+/* Báo cáo diễn biến hằng ngày */
+.daily-report{background:#fff;border:1px solid #d7e2eb;border-top:4px solid #347f99;border-radius:12px;padding:14px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
+.daily-report-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.daily-report-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
+.daily-report-stat{background:#f4f8fb;border:1px solid #dce7ee;border-radius:8px;padding:10px;text-align:center;cursor:pointer;color:#243447}.daily-report-stat:hover{background:#e7f2f8;border-color:#347f99}.daily-report-stat:focus{outline:2px solid #347f99;outline-offset:2px}
+.daily-report-stat b{display:block;font-size:24px;color:#2c526b}
+.daily-event{border:1px solid #e0e7ee;border-left:4px solid #347f99;border-radius:8px;padding:11px;margin:8px 0;background:#fff}
+.daily-event .meta{font-size:12px;color:#64748b;margin-top:4px}
+.daily-event .movement{font-weight:700;margin:5px 0}
+.daily-event.increase{border-left-color:#27ae60}.daily-event.decrease{border-left-color:#e74c3c}.daily-event.transfer{border-left-color:#8e44ad}
+@media(max-width:700px){.daily-report-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
-<link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#2c3e50"></head>
+<link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#2c3e50"><meta name="app-permission-revision" content="2026-10-13-r1"></head>
 <body>
 <div class="container">
 <h1>THEO DÕI QUÂN SỐ – DIỄN BIẾN TẠI KHU</h1>
@@ -89,6 +100,16 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
   <button class="btn green manager-only" style="display:none" onclick="openPerson()">＋ Thêm đối tượng</button>
   <input id="search" class="search" placeholder="Tìm theo tên đối tượng..." oninput="render()">
 </div>
+<section id="dailyReportPanel" class="daily-report" style="display:none">
+  <div class="daily-report-head"><h2 style="margin:2px 0">📋 Báo cáo diễn biến hằng ngày</h2><button class="btn gray" onclick="closeDailyReport()">Đóng</button></div>
+  <p style="margin:6px 0;color:#64748b">Tự tổng hợp từ các lần thêm/sửa hồ sơ và chuyển vị trí đã lưu trên hệ thống. Chọn ngày để xem đầy đủ danh sách đối tượng và diễn biến.</p>
+  <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:12px 0">
+    <div style="min-width:180px;flex:1"><label for="dailyReportDate">Ngày báo cáo</label><input id="dailyReportDate" type="date" onchange="renderDailyReport()"></div>
+    <button class="btn blue" onclick="renderDailyReport()">Xem báo cáo</button>
+    <button class="btn green" onclick="printDailyReport()">Xuất báo cáo / Lưu PDF</button>
+  </div>
+  <div id="dailyReportContent"></div>
+</section>
 <div style="display:none" aria-hidden="true">
 <div class="stats"><div class="stat"><small>Tổng quân số</small><b id="countKhu">0</b></div><div class="stat"><b id="countYte">0</b></div><div class="stat"><b id="countBv">0</b></div><div class="stat"><b id="countDx">0</b></div><div class="stat"><b id="countMed">0</b></div><div class="stat"><b id="countDxWeek">0</b></div></div>
 <div id="popMale">0</div><div id="popFemale">0</div><div id="popOver60">0</div><div id="popUnder60">0</div><div id="popDisabled">0</div>
@@ -125,6 +146,7 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <button class="close" onclick="closeModal('loginModal')">×</button>
 <h2>☰ Menu</h2>
 <div style="margin:12px 0 16px"><button type="button" class="btn green" style="width:100%;min-height:46px" onclick="openMealModal()">🍲 Thực đơn hôm nay</button></div>
+  <div style="margin:0 0 16px"><button type="button" class="btn blue" style="width:100%;min-height:46px" onclick="closeModal('loginModal');openDailyReport()">📋 Diễn biến hằng ngày</button><small style="display:block;color:#64748b;margin-top:5px">Báo cáo tăng giảm quân số, chuyển đi/chuyển đến, hồi gia và tử vong</small></div>
 <p class="notice">Tài khoản này dùng để thêm, sửa và xóa hồ sơ. Nhân viên bình thường không cần đăng nhập.</p>
 <div id="accountStatus" class="notice" style="display:none"></div><div id="accountAdminArea" style="display:none;margin:10px 0"><button type="button" class="btn dark" onclick="openAdminAccountInfo()">⚙️ Quản lý tài khoản</button></div>
 <div id="loginRoleChooser" class="field" style="margin:12px 0">
@@ -215,6 +237,20 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <div class="actions"><button type="button" class="btn gray" onclick="closeModal('transferModal')">Hủy</button><button class="btn purple">Lưu chuyển vị trí</button></div>
 </form></div></div>
 
+<div id="editTransferHistoryModal" class="modal">
+<div class="box" style="max-width:560px">
+<button class="close" onclick="closeModal('editTransferHistoryModal')">×</button>
+<h2>Chỉnh sửa lịch sử chuyển vị trí</h2>
+<div id="editTransferHistoryPerson" class="notice"></div>
+<form onsubmit="saveTransferHistoryEdit(event)">
+<input type="hidden" id="editTransferHistoryPersonId"><input type="hidden" id="editTransferHistoryIndex">
+<div class="field"><label>Thời điểm chuyển *</label><input id="editTransferHistoryDate" type="datetime-local" required></div>
+<div class="field"><label>Vị trí trước khi chuyển *</label><input id="editTransferHistoryFrom" required></div>
+<div class="field"><label>Vị trí sau khi chuyển *</label><input id="editTransferHistoryTo" required></div>
+<div class="field"><label>Ghi chú / lý do</label><textarea id="editTransferHistoryNote" rows="3"></textarea></div>
+<div class="actions"><button type="button" class="btn gray" onclick="closeModal('editTransferHistoryModal')">Hủy</button><button class="btn green">Lưu chỉnh sửa</button></div>
+</form></div></div>
+
 <div id="dxFormModal" class="modal">
 <div class="box" style="max-width:560px">
 <button class="close" onclick="closeModal('dxFormModal')">×</button>
@@ -246,6 +282,17 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 </div><div class="actions" id="mealViewerActions"><button type="button" class="btn blue" onclick="openMealUpload()">＋ Tải thực đơn lên</button><button class="btn gray" onclick="closeModal('mealModal')">Đóng</button></div>
 </div></div>
 
+<div id="passwordModal" class="modal"><div class="box" style="max-width:460px">
+<button class="close" type="button" onclick="closeModal('passwordModal')">×</button>
+<h2>🔐 Đổi mật khẩu</h2>
+<p class="notice">Đổi mật khẩu cho tài khoản đang đăng nhập. Mật khẩu mới phải có ít nhất 8 ký tự.</p>
+<form onsubmit="changeOwnPassword(event)">
+<div class="field"><label>Mật khẩu hiện tại</label><input id="oldPassword" type="password" autocomplete="current-password" required></div>
+<div class="field" style="margin-top:10px"><label>Mật khẩu mới</label><input id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+<div class="field" style="margin-top:10px"><label>Nhập lại mật khẩu mới</label><input id="confirmPassword" type="password" autocomplete="new-password" minlength="8" required></div>
+<div class="actions"><button type="button" class="btn gray" onclick="closeModal('passwordModal')">Hủy</button><button type="submit" class="btn green">Cập nhật mật khẩu</button></div>
+</form></div></div>
+
 <script>
 /* ================= SUPABASE ================= */
 const SUPABASE_URL = 'https://izsvbljotokmfuknvhcz.supabase.co';
@@ -254,6 +301,7 @@ const SESSION_KEY='btxh_manager_session';
 let people=[];
 let photoData='';
 let managerSession=null;
+let managerPermission=null;
 const $=id=>document.getElementById(id);
 
 function headers(extra={}){
@@ -304,21 +352,34 @@ async function api(path, options={}){
 }
 function authApi(path, options={}){return fetch(SUPABASE_URL+'/auth/v1/'+path,Object.assign({headers:{'apikey':SUPABASE_KEY,'Content-Type':'application/json'}},options));}
 function getUserRole(){
+  if(managerPermission?.vai_tro)return String(managerPermission.vai_tro).toLowerCase();
   const u=managerSession?.user||{}, app=u.app_metadata||{}, meta=u.user_metadata||{};
   return String(app.role||meta.role||meta.vai_tro||'viewer').toLowerCase();
 }
 function getAssignedHouse(){
+  if(managerPermission?.pham_vi)return String(managerPermission.pham_vi).trim();
   const u=managerSession?.user||{}, meta=u.user_metadata||{}, app=u.app_metadata||{};
   return String(app.house||app.nha||meta.house||meta.nha||'').trim();
 }
-function isAdmin(){return !!managerSession?.access_token && ['admin','administrator','quan_tri','quản trị'].includes(getUserRole());}
-function isManager(){return !!managerSession?.access_token && (isAdmin() || ['manager','quan_ly','quản lý','house_manager','y_te','medical'].includes(getUserRole()));}
+function isAdmin(){return !!managerSession?.access_token && (getUserRole()==='admin' || ['administrator','quan_tri','quản trị'].includes(getUserRole()));}
+function isManager(){return !!managerSession?.access_token && !!managerPermission && managerPermission.trang_thai===true && (isAdmin() || ['quan_ly','nguoi_dung','manager','house_manager','y_te','medical'].includes(getUserRole()));}
+function isMedicalAccount(){return ['Y tế','y_te','medical'].includes(getAssignedHouse()) || ['y_te','medical'].includes(getUserRole());}
 function canManagePerson(p){
-  if(!isManager())return false;
+  if(!isManager()||!p)return false;
   if(isAdmin())return true;
-  const role=getUserRole(), house=getAssignedHouse();
-  if(['y_te','medical'].includes(role))return ['Phòng Y tế','Bệnh viện'].includes(currentLocation(p));
-  return !!house && String(p?.nha||'').trim()===house;
+  const scope=getAssignedHouse();
+  if(isMedicalAccount())return ['Phòng Y tế','Bệnh viện'].includes(currentLocation(p)) || ['Y tế','Phòng Y tế'].includes(String(p?.nha||'').trim());
+  return !!scope && String(p?.nha||'').trim()===scope;
+}
+async function loadMyPermission(){
+  const userId=managerSession?.user?.id;
+  if(!userId)throw new Error('Không xác định được tài khoản đăng nhập.');
+  const r=await api('phan_quyen?select=user_id,vai_tro,ho_ten,trang_thai,pham_vi&user_id=eq.'+encodeURIComponent(userId)+'&trang_thai=eq.true&limit=1');
+  if(!r.ok)throw new Error('Không đọc được phân quyền Supabase: '+await r.text());
+  const rows=await r.json();
+  if(!rows.length)throw new Error('Tài khoản chưa được cấp quyền hoặc đang bị khóa trong bảng phan_quyen.');
+  managerPermission=rows[0];
+  return managerPermission;
 }
 function openAccountMenu(){
   if(!managerSession){openLogin();return;}
@@ -330,10 +391,28 @@ function openAccountMenu(){
   $('loginRoleChooser').style.display='none';$('loginHouseWrap').style.display='none';
   $('loginModal').querySelector('.notice').style.display='none';
   $('loginModal').querySelector('form').style.display='none';
-  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Đóng</button><button type="button" class="btn red" onclick="logout();closeModal(\'loginModal\')">Đăng xuất</button>';
+  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Đóng</button><button type="button" class="btn blue" onclick="closeModal(\'loginModal\');openModal(\'passwordModal\')">Đổi mật khẩu</button><button type="button" class="btn red" onclick="logout();closeModal(\'loginModal\')">Đăng xuất</button>';
   openModal('loginModal');
 }
-function openAdminAccountInfo(){alert('Mục quản lý đã được đưa vào Tài khoản. Để tạo tài khoản và áp dụng phân quyền an toàn, cần cấu hình bảng quyền và chính sách RLS trên Supabase.');}
+async function changeOwnPassword(e){
+  e.preventDefault();
+  if(!managerSession?.access_token){alert('Vui lòng đăng nhập trước khi đổi mật khẩu.');return;}
+  const oldPass=$('oldPassword').value, next=$('newPassword').value, confirmPass=$('confirmPassword').value;
+  if(next.length<8){alert('Mật khẩu mới phải có ít nhất 8 ký tự.');return;}
+  if(next!==confirmPass){alert('Mật khẩu nhập lại không khớp.');return;}
+  if(next===oldPass){alert('Mật khẩu mới phải khác mật khẩu hiện tại.');return;}
+  try{
+    const email=managerSession.user?.email;
+    if(!email)throw new Error('Không xác định được email tài khoản để xác minh mật khẩu hiện tại.');
+    const verify=await authApi('token?grant_type=password',{method:'POST',body:JSON.stringify({email,password:oldPass})});
+    if(!verify.ok)throw new Error('Mật khẩu hiện tại không đúng hoặc phiên đăng nhập không hợp lệ.');
+    const r=await fetch(SUPABASE_URL+'/auth/v1/user',{method:'PUT',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+managerSession.access_token,'Content-Type':'application/json'},body:JSON.stringify({password:next})});
+    if(!r.ok)throw new Error('Supabase không cập nhật được mật khẩu: '+await r.text());
+    $('oldPassword').value='';$('newPassword').value='';$('confirmPassword').value='';
+    closeModal('passwordModal');alert('Đổi mật khẩu thành công. Hãy dùng mật khẩu mới cho lần đăng nhập tiếp theo.');
+  }catch(err){console.error(err);alert('Không đổi được mật khẩu.\\n\\n'+(err.message||'Vui lòng thử lại.'))}
+}
+function openAdminAccountInfo(){alert('ADMIN: tạo tài khoản, cấp tên đăng nhập, đặt lại mật khẩu và khóa/mở tài khoản cần dịch vụ quản trị phía máy chủ (Supabase Edge Function) được cấu hình trước. Không thể thực hiện an toàn chỉ bằng HTML công khai. Không đưa khóa service_role vào file này. Chức năng đổi mật khẩu của chính tài khoản đã đăng nhập đã được bổ sung.');}
 function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
 function openModal(id='personModal'){ $(id).classList.add('show') }
 function closeModal(id){$(id).classList.remove('show')}
@@ -353,7 +432,7 @@ function updateAuthUI(){
   document.querySelectorAll('.manager-only').forEach(x=>x.style.display=isAdmin()?'inline-block':'none');
   const importInput=$('importFile'); if(importInput) importInput.style.display='none';
 }
-function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI();if(managerSession?.refresh_token)refreshSession(false)}
+function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI();if(managerSession?.refresh_token)refreshSession(false);if(managerSession?.access_token)loadMyPermission().then(()=>{updateAuthUI();render()}).catch(()=>{managerPermission=null;managerSession=null;localStorage.removeItem(SESSION_KEY);updateAuthUI()})}
 function toggleLoginHouse(){
   const isHouse=$('loginRoleType')?.value==='house';
   if($('loginHouseWrap'))$('loginHouseWrap').style.display=isHouse?'block':'none';
@@ -367,23 +446,23 @@ async function login(e){
     const r=await authApi('token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('loginEmail').value.trim(),password:$('loginPassword').value})});
     if(!r.ok)throw new Error(await r.text());
     const session=await r.json();
-    const app=session.user?.app_metadata||{}, meta=session.user?.user_metadata||{};
-    const role=String(app.role||meta.role||meta.vai_tro||'viewer').toLowerCase();
-    const house=String(app.house||app.nha||meta.house||meta.nha||'').trim();
-    const admin=['admin','administrator','quan_tri','quản trị'].includes(role);
-    const medical=['y_te','medical'].includes(role);
-    const houseRole=['manager','quan_ly','quản lý','house_manager','nhan_vien_nha'].includes(role);
-    if(wanted==='admin'&&!admin){throw new Error('Tài khoản này không được cấp quyền ADMIN.');}
-    if(wanted==='yte'&&!medical){throw new Error('Tài khoản này chưa được cấp quyền Y tế.');}
-    if(wanted==='house'&&(!houseRole||house!==chosenHouse)){throw new Error('Tài khoản chưa được cấp quyền cho '+chosenHouse+'.');}
-    managerSession=session;
+    managerSession=session;managerPermission=null;
+    const perm=await loadMyPermission();
+    const role=String(perm.vai_tro||'').toLowerCase();
+    const scope=String(perm.pham_vi||'').trim();
+    const admin=role==='admin';
+    const medical=['y tế','phòng y tế'].includes(scope.toLowerCase()) || ['y_te','medical'].includes(role);
+    const houseRole=['quan_ly','nguoi_dung','manager','house_manager'].includes(role) && /^Nhà\s+(1[01]|[1-9])$/i.test(scope);
+    if(wanted==='admin'&&!admin)throw new Error('Tài khoản này chưa được cấp vai_tro=admin trong bảng phan_quyen.');
+    if(wanted==='yte'&&!medical)throw new Error('Tài khoản này chưa được cấp phạm vi Y tế trong bảng phan_quyen.');
+    if(wanted==='house'&&(!houseRole||scope!==chosenHouse))throw new Error('Tài khoản chưa được cấp quyền cho '+chosenHouse+' trong bảng phan_quyen.');
     localStorage.setItem(SESSION_KEY,JSON.stringify(managerSession));
     closeModal('loginModal'); $('loginPassword').value=''; updateAuthUI(); render();
     alert('Đăng nhập thành công.');
   }catch(err){console.error(err);alert('Đăng nhập thất bại.\n\n'+(err.message||'Kiểm tra tài khoản, mật khẩu và quyền được cấp trong Supabase.'))}
 }
 function logout(){
-  managerSession=null;localStorage.removeItem(SESSION_KEY);
+  managerSession=null;managerPermission=null;localStorage.removeItem(SESSION_KEY);
   $('loginModal').querySelector('form').style.display='block';
   $('loginModal').querySelector('h2').textContent='Trang chủ – Chọn tài khoản đăng nhập';
   $('loginModal').querySelector('.notice').style.display='block';
@@ -409,7 +488,9 @@ async function loadPeople(){
     if(!r.ok)throw new Error(await r.text());
     const rows=await r.json();
     people=rows.map(x=>Object.assign({id:x.id},x.data||{}));
-    await loadDx(); render();
+    await loadDx();
+    await loadReviews();
+    render();
   }catch(e){showCloudError(e)}
 }
 async function loadDx(){
@@ -420,13 +501,23 @@ async function loadDx(){
   people.forEach(p=>p.khamDotXuat=map[p.id]||[]);
 }
 
+async function loadReviews(){
+  const r=await api('lich_tai_kham?select=id,person_id,review_date,note,created_at&order=review_date.desc');
+  if(!r.ok)throw new Error(await r.text());
+  const rows=await r.json();const byPerson={};
+  rows.forEach(x=>(byPerson[String(x.person_id)]??=[]).push({id:x.id,date:x.review_date,note:x.note||'',createdAt:x.created_at||''}));
+  people.forEach(p=>{const legacy=Array.isArray(p.lichTaiKham)?p.lichTaiKham:[];const current=byPerson[String(p.id)]||[];p.lichTaiKham=[...current,...legacy];if(p.lichTaiKham.length){p.ngayTaiKham=p.lichTaiKham.map(x=>String(x.date||'').slice(0,10)).filter(Boolean).sort().at(-1)||p.ngayTaiKham||'';}});
+}
+
 function toggleOtherDisease(){const on=$('thuocKhac').checked;$('thuocKhacWrap').style.display=on?'block':'none';$('thuocKhacText').required=on;if(!on)$('thuocKhacText').value='';}
 function resetPersonForm(){
-  $('personForm').reset();$('editId').value='';photoData='';$('preview').src='';$('coCccd').value='Không';$('cccd').value='';toggleCccd();toggleOtherDisease();$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
+  $('personForm').reset();$('nha').disabled=false;$('editId').value='';photoData='';$('preview').src='';$('coCccd').value='Không';$('cccd').value='';toggleCccd();toggleOtherDisease();$('modalTitle').textContent='Thêm đối tượng mới';$('statusDateWrap').style.display='none';$('bvWrap').style.display='none';
 }
 function openPerson(id=null){
   if(!isManager() || (id && !canManagePerson(people.find(x=>x.id===id)))){if(id)viewPerson(id);else alert('Bạn không có quyền thêm hồ sơ.');return;}
   resetPersonForm();
+  if(!id&&!isAdmin()&&!isMedicalAccount()){$('nha').value=getAssignedHouse();$('nha').disabled=true;syncHouseLocation();}
+  if(!id&&isMedicalAccount()){$('nha').value='Y tế';$('nha').disabled=true;syncHouseLocation();}
   if(id){
     const p=people.find(x=>x.id===id);if(!p)return;
     $('modalTitle').textContent='Sửa thông tin đối tượng';$('editId').value=id;
@@ -435,16 +526,133 @@ function openPerson(id=null){
   }
   openModal('personModal');
 }
+function localDateKey(value=new Date()){
+  const d=value instanceof Date?value:new Date(value);
+  if(Number.isNaN(d.getTime()))return '';
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dailyPlace(p){
+  if(!p)return 'Chưa xác định';
+  const status=p.trangthai||'Đang quản lý';
+  if(status!=='Đang quản lý')return status;
+  const loc=currentLocation(p);
+  return loc==='Khu'?`Khu – ${p.nha||'Chưa chọn nhà'}`:loc==='Bệnh viện'?`Bệnh viện${p.bvInfo?' – '+p.bvInfo:''}`:(loc||p.nha||'Chưa xác định');
+}
+function makeDailyEvent({type,title,p,from='',to='',reason='',dateTime=new Date().toISOString()}){
+  return {id:uid(),date:localDateKey(dateTime),dateTime,type,title,personId:String(p?.id||''),ma:p?.ma||'',ten:p?.ten||'',from,to,reason,by:managerSession?.user?.email||'Tài khoản đã đăng nhập'};
+}
+function appendDailyEvent(person,event){
+  if(!person)return;
+  person.dienBienHangNgay=Array.isArray(person.dienBienHangNgay)?person.dienBienHangNgay:[];
+  person.dienBienHangNgay.push(event);
+}
+function allDailyEvents(){
+  return people.flatMap(p=>(Array.isArray(p.dienBienHangNgay)?p.dienBienHangNgay:[]).map(e=>({...e,personId:String(e.personId||p.id),ma:e.ma||p.ma||'',ten:e.ten||p.ten||''})))
+    .sort((a,b)=>String(b.dateTime||'').localeCompare(String(a.dateTime||'')));
+}
+function openDailyReport(){
+  hideCensusPanel();hideDashboardList();
+  if(!$('dailyReportDate').value)$('dailyReportDate').value=localDateKey();
+  $('dailyReportPanel').style.display='block';renderDailyReport();
+  $('dailyReportPanel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeDailyReport(){$('dailyReportPanel').style.display='none';}
+let dailyReportFilter='all';
+function selectDailyReportDetail(filter){dailyReportFilter=filter;renderDailyReport();const el=$('dailyDetailSection');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});}
+function renderDailyReport(){
+  const date=$('dailyReportDate')?.value||localDateKey();
+  const events=allDailyEvents().filter(e=>(e.date||localDateKey(e.dateTime))===date);
+  const transfers=events.filter(e=>e.type==='transfer').length;
+  const active=people.filter(isCurrentlyManaged);
+  const currentYear=new Date().getFullYear();
+  const over60=active.filter(p=>p.namsinh&&currentYear-Number(p.namsinh)>60).length;
+  const under60=active.filter(p=>p.namsinh&&currentYear-Number(p.namsinh)<60).length;
+  const male=active.filter(p=>p.gioitinh==='Nam').length;
+  const female=active.filter(p=>p.gioitinh==='Nữ').length;
+  const disabled=active.filter(p=>p.khuyettat==='Có').length;
+  const statusEvents=events.filter(e=>/hồi gia|tử vong|chuyển đi/i.test((e.title||'')+' '+(e.to||'')));
+  const fmt=v=>{if(!v)return '—';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'});};
+  const stat=(label,n,filter)=>`<button type="button" class="daily-report-stat" onclick="selectDailyReportDetail('${filter}')" title="Nhấp để xem danh sách chi tiết"><span>${label}</span><b>${n}</b><small style="display:block;margin-top:4px;color:#347f99">Nhấp để xem chi tiết</small></button>`;
+  const cards=`<div class="daily-report-stats">
+    ${stat('Quân số đang quản lý hiện tại',active.length,'active')}
+    ${stat('Diễn biến ghi nhận trong ngày',events.length,'all')}
+    ${stat('Trên 60 tuổi',over60,'over60')}
+    ${stat('Dưới 60 tuổi',under60,'under60')}
+    ${stat('Nam',male,'male')}
+    ${stat('Nữ',female,'female')}
+    ${stat('Khuyết tật',disabled,'disabled')}
+    ${stat('Lượt chuyển vị trí',transfers,'transfer')}
+    ${stat('Hồi gia / tử vong / chuyển đi',statusEvents.length,'status')}
+  </div>`;
+  let detail='';
+  if(dailyReportFilter==='active'){
+    const roster=active.slice().sort((a,b)=>String(a.ten||'').localeCompare(String(b.ten||''),'vi'));
+    detail=roster.length?roster.map(p=>`<article class="daily-event"><div class="movement">${esc(p.ten||'Chưa có họ tên')} — Mã ĐT: ${esc(p.ma||'Chưa có mã')}</div><div><b>Năm sinh:</b> ${esc(p.namsinh||'—')} · <b>Giới tính:</b> ${esc(p.gioitinh||'—')} · <b>Khuyết tật:</b> ${esc(p.khuyettat||'Không rõ')}</div><div><b>Vị trí:</b> ${esc(locationText(p)||'Chưa xác định')} · <b>Nhà:</b> ${esc(p.nha||'—')}</div><div><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><button class="btn blue" style="margin-top:7px" onclick="viewPerson('${String(p.id).replace(/'/g,"\'")}')">Xem hồ sơ đầy đủ</button></article>`).join(''):'<div class="notice">Không có hồ sơ đang quản lý.</div>';
+  }else{
+    let list=events;
+    if(dailyReportFilter==='transfer')list=events.filter(e=>e.type==='transfer');
+    else if(['over60','under60','male','female','disabled'].includes(dailyReportFilter)){
+      const filters={over60:p=>p.namsinh&&currentYear-Number(p.namsinh)>60,under60:p=>p.namsinh&&currentYear-Number(p.namsinh)<60,male:p=>p.gioitinh==='Nam',female:p=>p.gioitinh==='Nữ',disabled:p=>p.khuyettat==='Có'};
+      const roster=active.filter(filters[dailyReportFilter]).slice().sort((a,b)=>String(a.ten||'').localeCompare(String(b.ten||''),'vi'));
+      detail=roster.length?roster.map(p=>`<article class="daily-event"><div class="movement">${esc(p.ten||'Chưa có họ tên')} — Mã ĐT: ${esc(p.ma||'Chưa có mã')}</div><div><b>Năm sinh:</b> ${esc(p.namsinh||'—')} · <b>Giới tính:</b> ${esc(p.gioitinh||'—')} · <b>Khuyết tật:</b> ${esc(p.khuyettat||'Không rõ')}</div><div><b>Vị trí:</b> ${esc(locationText(p)||'Chưa xác định')} · <b>Nhà:</b> ${esc(p.nha||'—')}</div><button class="btn blue" style="margin-top:7px" onclick="viewPerson('${String(p.id).replace(/'/g,"\'")}')">Xem hồ sơ đầy đủ</button></article>`).join(''):'<div class="notice">Không có đối tượng thuộc mục này.</div>';
+      list=[];
+    }
+    else if(dailyReportFilter==='status')list=statusEvents;
+    detail=list.length?list.map(e=>{
+      const cls=e.type==='increase'?'increase':e.type==='decrease'?'decrease':e.type==='transfer'?'transfer':'';
+      return `<article class="daily-event ${cls}">
+        <div><b>${esc(e.title||'Diễn biến hồ sơ')}</b></div>
+        <div class="movement">${esc(e.ten||'Chưa có họ tên')} — Mã ĐT: ${esc(e.ma||'Chưa có mã')}</div>
+        ${e.from?`<div><b>Từ:</b> ${esc(e.from)}</div>`:''}
+        ${e.to?`<div><b>Đến / trạng thái:</b> ${esc(e.to)}</div>`:''}
+        ${e.reason?`<div><b>Lý do / ghi chú:</b> ${esc(e.reason)}</div>`:''}
+        <div class="meta">Thời gian ghi nhận: ${esc(fmt(e.dateTime))} · Người ghi nhận: ${esc(e.by||'Không lưu thông tin')}</div>
+        <button class="btn blue" style="margin-top:7px" onclick="viewPerson('${String(e.personId).replace(/'/g,"\'")}')">Xem hồ sơ đầy đủ</button>
+      </article>`;
+    }).join(''):'<div class="notice">Chưa có dữ liệu thuộc mục này trong ngày đã chọn. Lịch sử chỉ hiển thị các diễn biến đã được ghi nhận trên hệ thống.</div>';
+  }
+  const labels={all:'Tất cả diễn biến trong ngày',active:'Danh sách đầy đủ đối tượng đang quản lý',over60:'Danh sách đối tượng trên 60 tuổi',under60:'Danh sách đối tượng dưới 60 tuổi',male:'Danh sách đối tượng nam',female:'Danh sách đối tượng nữ',disabled:'Danh sách đối tượng khuyết tật',transfer:'Danh sách chuyển vị trí',status:'Danh sách hồi gia / tử vong / chuyển đi'};
+  $('dailyReportContent').innerHTML=`<h3 style="margin:8px 0">BÁO CÁO NGÀY ${esc(date.split('-').reverse().join('/'))}</h3>${cards}<div id="dailyDetailSection" class="section">${labels[dailyReportFilter]||labels.all} (${dailyReportFilter==='active'?active.length:(dailyReportFilter==='all'?events.length:detail?((detail.match(/class="daily-event/g)||[]).length):0)} mục)</div>${detail}`;
+}
+function printDailyReport(){
+  renderDailyReport();
+  const date=$('dailyReportDate')?.value||localDateKey();
+  const content=$('dailyReportContent')?.innerHTML||'';
+  const win=window.open('','_blank');
+  if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Cho phép cửa sổ bật lên rồi thử lại.');return;}
+  win.document.open();
+  win.document.write(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo diễn biến ${date}</title><style>body{font-family:Arial,sans-serif;color:#243447;margin:22px}h2,h3{text-align:center} .daily-report-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.daily-report-stat{border:1px solid #cbd5e1;padding:9px;text-align:center}.daily-report-stat b{display:block;font-size:20px}.daily-event{border:1px solid #cbd5e1;border-left:4px solid #347f99;padding:10px;margin:8px 0;break-inside:avoid}.meta{font-size:11px;color:#475569;margin-top:5px}button{display:none}.section{font-weight:bold;border-bottom:1px solid #ddd;margin-top:18px}@media print{body{margin:12mm}}</style></head><body><h2>TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</h2><h3>BÁO CÁO DIỄN BIẾN HẰNG NGÀY — ${date.split('-').reverse().join('/')}</h3>${content}<p style="text-align:right;margin-top:35px">Người lập báo cáo: ................................</p><script>window.onload=()=>setTimeout(()=>window.print(),250);<\\/script></body></html>`);
+  win.document.close();
+}
+
 async function savePerson(e){
   e.preventDefault();if($('vitri').value==='Bệnh viện'&&!$('bvInfo').value.trim()){alert('Vui lòng nhập tên bệnh viện.');$('bvInfo').focus();return;}if(!isManager()){alert('Bạn không có quyền quản lý hồ sơ.');return;}
   const editingId=$('editId').value;if(editingId&&!canManagePerson(people.find(x=>x.id===editingId))){alert('Bạn chỉ được quản lý hồ sơ thuộc phạm vi được giao.');return;}const id=editingId||uid();
   const old=people.find(p=>p.id===id);
-  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,gioitinh:$('gioitinh').value,khuyettat:$('khuyettat').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),ngayTaiKham:$('ngayTaiKham').value,khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),tinhTrang:$('tinhTrang').value.trim(),ghiChuChuyen:old?.ghiChuChuyen||'',trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',locationHistory:old?.locationHistory||[],readmissionHistory:old?.readmissionHistory||[],updated:new Date().toISOString()};
+  const p={id,ma:$('ma').value.trim(),ten:$('ten').value.trim(),namsinh:$('namsinh').value,gioitinh:$('gioitinh').value,khuyettat:$('khuyettat').value,coCccd:$('coCccd').value,cccd:$('coCccd').value==='Có'?$('cccd').value.trim():'',ngaynhap:$('ngaynhap').value,nha:$('nha').value,diachi:$('diachi').value.trim(),nguoiThan:$('nguoiThan').value.trim(),quanHe:$('quanHe').value,sdtNguoiThan:$('sdtNguoiThan').value.trim(),vitri:$('vitri').value,bhyt:$('bhyt').value.trim(),ngayTaiKham:$('ngayTaiKham').value,khu:old?.khu||'',bvInfo:$('bvInfo').value.trim(),thuocHA:$('thuocHA').checked,thuocTT:$('thuocTT').checked,thuocKhac:$('thuocKhac').checked,thuocKhacText:$('thuocKhacText').value.trim(),tinhTrang:$('tinhTrang').value.trim(),ghiChuChuyen:old?.ghiChuChuyen||'',trangthai:$('trangthai').value,statusDate:$('statusDate').value,photo:photoData||old?.photo||'',locationHistory:old?.locationHistory||[],readmissionHistory:old?.readmissionHistory||[],dienBienHangNgay:old?.dienBienHangNgay||[],updated:new Date().toISOString()};
   const reactivated=!!old&&(old.trangthai==='Hồi gia'||old.trangthai==='Tử vong'||old.trangthai==='Chuyển đi nơi khác')&&p.trangthai==='Đang quản lý';
   if(reactivated){const today=new Date().toISOString().slice(0,10);p.ngaynhap=today;$('ngaynhap').value=today;p.readmissionHistory.push({date:today,fromStatus:old.trangthai||'',toStatus:'Đang quản lý'});p.statusDate='';}
   if(!p.ma||!p.ten)return alert('Vui lòng nhập Mã đối tượng và Họ tên.');
   if(p.thuocKhac&&!p.thuocKhacText)return alert('Vui lòng nhập tên bệnh khác.');
   if(!old)p.khamDotXuat=[];
+  const eventNow=new Date().toISOString();
+  if(!old){
+    appendDailyEvent(p,makeDailyEvent({type:'increase',title:'Tăng quân số — tiếp nhận / thêm hồ sơ mới',p,from:'Ngoài danh sách quản lý',to:dailyPlace(p),reason:'Thêm hồ sơ đối tượng mới',dateTime:eventNow}));
+  }else{
+    const oldStatus=old.trangthai||'Đang quản lý', newStatus=p.trangthai||'Đang quản lý';
+    const oldPlace=dailyPlace(old), newPlace=dailyPlace(p);
+    if(oldStatus!==newStatus){
+      if(newStatus==='Đang quản lý'){
+        appendDailyEvent(p,makeDailyEvent({type:'increase',title:'Tăng quân số — tiếp nhận trở lại',p,from:oldStatus,to:newPlace,reason:'Đối tượng được chuyển về trạng thái đang quản lý',dateTime:eventNow}));
+      }else if(['Hồi gia','Tử vong','Chuyển đi nơi khác'].includes(newStatus)){
+        appendDailyEvent(p,makeDailyEvent({type:'decrease',title:'Giảm quân số — '+newStatus,p,from:oldPlace,to:newStatus,reason:$('statusDate').value?('Ngày ghi nhận: '+$('statusDate').value):'Cập nhật trạng thái hồ sơ',dateTime:eventNow}));
+      }else{
+        appendDailyEvent(p,makeDailyEvent({type:'status',title:'Thay đổi trạng thái hồ sơ',p,from:oldStatus,to:newStatus,dateTime:eventNow}));
+      }
+    }else if(oldPlace!==newPlace){
+      appendDailyEvent(p,makeDailyEvent({type:'transfer',title:'Chuyển vị trí / nhà / khu',p,from:oldPlace,to:newPlace,reason:'Cập nhật vị trí trong hồ sơ',dateTime:eventNow}));
+    }
+  }
   try{
     const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})});
     if(!r.ok)throw new Error(await r.text());
@@ -452,9 +660,13 @@ async function savePerson(e){
   }catch(err){showCloudError(err)}
 }
 async function delPerson(id){
-  if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
+  if(!isAdmin()){alert('Chỉ ADMIN mới được xóa hồ sơ đối tượng.');return;}
   const p=people.find(x=>x.id===id);if(!p)return;if(!confirm('Xóa đối tượng '+p.ten+'?'))return;
   try{const r=await api('so_tay_suc_khoe?id=eq.'+encodeURIComponent(id),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});if(!r.ok)throw new Error(await r.text());await loadPeople();}catch(err){showCloudError(err)}
+}
+function isCurrentlyManaged(p){
+  const status=String(p?.trangthai||'Đang quản lý').trim().toLocaleLowerCase('vi-VN');
+  return status==='đang quản lý'||status==='đang quản lý '||status==='đang quản lý tại trung tâm';
 }
 function currentLocation(p){
   const dx=(p.khamDotXuat||[]).slice().sort((a,b)=>String(b.created_at||'').localeCompare(String(a.created_at||'')));
@@ -492,7 +704,7 @@ function openDxWeekly(){
 function render(){
   let q=($('search').value||'').trim().toLowerCase(),fs=$('filterStatus').value,fl=$('filterLocation').value;
 
-  const activePeople=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý');
+  const activePeople=people.filter(isCurrentlyManaged);
   const totalEl=$('total');if(totalEl)totalEl.textContent=activePeople.length;
   $('countKhu').textContent=activePeople.filter(p=>currentLocation(p)==='Khu').length;
   $('countYte').textContent=activePeople.filter(p=>currentLocation(p)==='Phòng Y tế').length;
@@ -518,7 +730,7 @@ function render(){
   $('countDx').textContent=people.reduce((n,p)=>n+(p.khamDotXuat||[]).length,0);
   $('countMed').textContent=activePeople.filter(isTakingMedicine).length;
   $('countDxWeek').textContent=weeklyDx().length;
-  const active=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý');
+  const active=people.filter(isCurrentlyManaged);
   const ageNow=new Date().getFullYear();
   $('popMale').textContent=active.filter(p=>p.gioitinh==='Nam').length;
   $('popFemale').textContent=active.filter(p=>p.gioitinh==='Nữ').length;
@@ -543,10 +755,10 @@ function render(){
   let arr=people.filter(p=>
     ((p.ten||'').toLowerCase().includes(q)||(p.ma||'').toLowerCase().includes(q)) &&
     (fs==='all'||(p.trangthai||'Đang quản lý')===fs) &&
-    (fl==='all'||(p.trangthai||'Đang quản lý')!=='Đang quản lý'||currentLocation(p)===fl)
+    (fl==='all'||!isCurrentlyManaged(p)||currentLocation(p)===fl)
   );
 
-  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${currentLocation(p)==='Khu'?'khu':currentLocation(p)==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${canManagePerson(p)?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button> <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
+  $('tbody').innerHTML=arr.map(p=>`<tr><td>${p.photo?`<img class="avatar" src="${p.photo}">`:'—'}</td><td>${esc(p.ma)}</td><td><b>${esc(p.ten)}</b></td><td>${esc(p.namsinh||'')}</td><td>${esc(p.diachi||'')}</td><td><span class="badge ${currentLocation(p)==='Khu'?'khu':currentLocation(p)==='Phòng Y tế'?'yte':'bv'}">${esc(locationText(p))}</span></td><td>${esc(meds(p))}</td><td>${esc(p.trangthai||'')}</td><td><button class="gray" onclick="viewPerson('${p.id}')">Xem</button>${canManagePerson(p)?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}${isAdmin()?` <button class="red btn" onclick="delPerson('${p.id}')">Xóa</button>`:''}</td></tr>`).join('');
 
   $('cards').innerHTML=arr.map(p=>`<div class="card"><div class="card-top">${p.photo?`<img class="avatar" src="${p.photo}">`:''}<div><h3>${esc(p.ten)}</h3><div>Mã: ${esc(p.ma)} • ${esc(p.namsinh||'')}</div><div><span class="badge">${esc(locationText(p))}</span> <span class="badge">${esc(p.trangthai||'')}</span></div></div></div><p>Thuốc: ${esc(meds(p))}</p><button class="gray" onclick="viewPerson('${p.id}')">Xem hồ sơ / Khám đột xuất</button>${canManagePerson(p)?` <button class="blue btn" onclick="openPerson('${p.id}')">Sửa</button>`:''}</div>`).join('');
 
@@ -558,25 +770,76 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function formatDateVN(value){if(!value)return '';const m=String(value).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:String(value)}
 function viewPerson(id){
   let p=people.find(x=>x.id===id);if(!p)return;let dx=p.khamDotXuat||[];
-  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>Giới tính:</b> ${esc(p.gioitinh||'—')}</div><div><b>Khuyết tật:</b> ${esc(p.khuyettat||'Không xác định')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập Trung tâm:</b> ${esc(formatDateVN(p.ngaynhap)||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Người thân:</b> ${esc(p.nguoiThan||'—')}</div><div><b>Quan hệ:</b> ${esc(p.quanHe||'—')}</div><div><b>SĐT người thân:</b> ${esc(p.sdtNguoiThan||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div class="full"><b>Số lần tiếp tục nhập Trung tâm:</b> ${(p.readmissionHistory||[]).length}<div><b>Lịch sử nhập lại:</b> ${(p.readmissionHistory||[]).length?(p.readmissionHistory||[]).slice().reverse().map(h=>`<div class="dx-item">${esc(formatDateVN(h.date))} — Tiếp tục nhập Trung tâm${h.fromStatus?` (trước đó: ${esc(h.fromStatus)})`:``}</div>`).join(''):'Chưa ghi nhận lần nhập lại.'}</div></div><div class="full"><b>Lịch sử chuyển khu/nhà, y tế, bệnh viện:</b> ${(p.locationHistory||[]).length?(p.locationHistory||[]).slice().reverse().map(h=>`<div class="dx-item">${esc(new Date(h.date).toLocaleString('vi-VN'))}: ${esc(h.from)} → ${esc(h.to)}${h.note?`<br>Ghi chú: ${esc(h.note)}`:''}</div>`).join(''):'Chưa có lịch sử chuyển vị trí.'}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div><div><b>Ngày tái khám:</b> ${esc(formatDateVN(p.ngayTaiKham)||'—')}</div><div class="full"><b>Tình trạng:</b> ${esc(p.tinhTrang||'—')}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div><button class="btn purple" onclick="openTransfer('${p.id}')">↔ Chuyển vị trí</button>${isManager()?` <button class="btn blue" onclick="openPerson('${p.id}')">✎ Sửa hồ sơ</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}${isManager()?`<br><button class="btn blue" onclick="openDxForm('${p.id}','${d.id}')">Sửa lượt khám</button> <button class="btn red" onclick="deleteDx('${d.id}','${p.id}')">Xóa lượt khám</button>`:``}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
+  $('detail').innerHTML=`<h2>${esc(p.ten)}</h2><div class="notice">Mã: <b>${esc(p.ma)}</b> • ${esc(p.trangthai||'')}</div><div class="grid">${p.photo?`<div><img class="preview" src="${p.photo}"></div>`:''}<div><b>Năm sinh:</b> ${esc(p.namsinh||'—')}</div><div><b>Giới tính:</b> ${esc(p.gioitinh||'—')}</div><div><b>Khuyết tật:</b> ${esc(p.khuyettat||'Không xác định')}</div><div><b>CCCD:</b> ${esc(p.coCccd|| (p.cccd?'Có':'Không'))}${p.cccd?` — ${esc(p.cccd)}`:''}</div><div><b>BHYT:</b> ${esc(p.bhyt||'—')}</div><div><b>Ngày nhập Trung tâm:</b> ${esc(formatDateVN(p.ngaynhap)||'—')}</div><div><b>Nhà:</b> ${esc(p.nha||'—')}</div><div class="full"><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><div><b>Người thân:</b> ${esc(p.nguoiThan||'—')}</div><div><b>Quan hệ:</b> ${esc(p.quanHe||'—')}</div><div><b>SĐT người thân:</b> ${esc(p.sdtNguoiThan||'—')}</div><div><b>Vị trí:</b> ${esc(locationText(p))}</div><div class="full"><b>Số lần tiếp tục nhập Trung tâm:</b> ${(p.readmissionHistory||[]).length}<div><b>Lịch sử nhập lại:</b> ${(p.readmissionHistory||[]).length?(p.readmissionHistory||[]).slice().reverse().map(h=>`<div class="dx-item">${esc(formatDateVN(h.date))} — Tiếp tục nhập Trung tâm${h.fromStatus?` (trước đó: ${esc(h.fromStatus)})`:``}</div>`).join(''):'Chưa ghi nhận lần nhập lại.'}</div></div><div class="full"><b>Lịch sử chuyển khu/nhà, y tế, bệnh viện:</b> ${(p.locationHistory||[]).length?(p.locationHistory||[]).slice().reverse().map((h,hi)=>`<div class="dx-item"><b>${esc(new Date(h.date).toLocaleString('vi-VN'))}</b>: ${esc(h.from)} → ${esc(h.to)}${h.note?`<br>Ghi chú: ${esc(h.note)}`:''}${isAdmin()?`<br><button class="btn blue" onclick="editTransferHistory('${String(p.id).replace(/'/g,"\'")}',${(p.locationHistory||[]).length-1-hi})">Sửa lịch sử</button> <button class="btn red" onclick="deleteTransferHistory('${String(p.id).replace(/'/g,"\'")}',${(p.locationHistory||[]).length-1-hi})">Xóa lịch sử</button>`:''}</div>`).join(''):'Chưa có lịch sử chuyển vị trí.'}</div><div><b>Thuốc:</b> ${esc(meds(p))}</div><div><b>Ngày tái khám:</b> ${esc(formatDateVN(p.ngayTaiKham)||'—')}</div><div class="full"><b>Tình trạng:</b> ${esc(p.tinhTrang||'—')}</div></div><div class="section">Khám đột xuất (${dx.length} lượt)</div>${canManagePerson(p)?`<button class="btn purple" onclick="openTransfer('${p.id}')">↔ Chuyển vị trí</button>`:''}${canManagePerson(p)?` <button class="btn blue" onclick="openPerson('${p.id}')">✎ Sửa hồ sơ</button>`:''}<div class="dx-list" style="margin-top:10px">${dx.length?dx.slice().reverse().map(d=>`<div class="dx-item"><b>${esc(d.dateTime)}</b><br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}${canManagePerson(p)?`<br><button class="btn blue" onclick="openDxForm('${p.id}','${d.id}')">Sửa lượt khám</button>`:``}${isAdmin()?` <button class="btn red" onclick="deleteDx('${d.id}','${p.id}')">Xóa lượt khám</button>`:``}</div>`).join(''):'Chưa có lần khám nào.'}</div>`;
   openModal('detailModal');
+}
+function toLocalDateTimeInput(value){const d=new Date(value);if(Number.isNaN(d.getTime()))return '';const pad=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;}
+function editTransferHistory(personId,index){
+ if(!isAdmin()){alert('Chỉ ADMIN được chỉnh sửa lịch sử chuyển vị trí.');return;}
+ const p=people.find(x=>String(x.id)===String(personId)),h=p?.locationHistory?.[index];if(!p||!h)return;
+ $('editTransferHistoryPersonId').value=personId;$('editTransferHistoryIndex').value=String(index);
+ $('editTransferHistoryPerson').innerHTML=`Đối tượng: <b>${esc(p.ten)}</b> — Mã: <b>${esc(p.ma)}</b>`;
+ $('editTransferHistoryDate').value=toLocalDateTimeInput(h.date);$('editTransferHistoryFrom').value=h.from||'';$('editTransferHistoryTo').value=h.to||'';$('editTransferHistoryNote').value=h.note||'';
+ openModal('editTransferHistoryModal');
+}
+function applyHistoryDestination(p,to,dateValue){
+ const dest=String(to||'').trim();
+ if(dest==='Hồi gia'||dest==='Tử vong'||dest==='Chuyển đi nơi khác') {p.trangthai=dest;p.statusDate=String(dateValue||'').slice(0,10);return;}
+ p.trangthai='Đang quản lý';p.statusDate='';
+ const house=dest.match(/Nhà\s+(1[01]|[1-9])/i);
+ if(house){p.vitri='Khu';p.nha='Nhà '+house[1];}
+ else if(/^Bệnh viện/i.test(dest)){p.vitri='Bệnh viện';const m=dest.match(/^Bệnh viện\s*[–—-]\s*(.*)$/i);if(m)p.bvInfo=m[1].trim();}
+ else if(/Phòng Y tế|Y tế/i.test(dest)){p.vitri='Phòng Y tế';}
+ else if(/^Khu/i.test(dest)){p.vitri='Khu';}
+}
+async function saveTransferHistoryEdit(e){
+ e.preventDefault();if(!isAdmin()){alert('Chỉ ADMIN được chỉnh sửa lịch sử chuyển vị trí.');return;}
+ const p=people.find(x=>String(x.id)===String($('editTransferHistoryPersonId').value)),index=Number($('editTransferHistoryIndex').value);if(!p||!p.locationHistory?.[index])return;
+ const old={...p.locationHistory[index]},dt=$('editTransferHistoryDate').value,from=$('editTransferHistoryFrom').value.trim(),to=$('editTransferHistoryTo').value.trim(),note=$('editTransferHistoryNote').value.trim();
+ if(!dt||!from||!to){alert('Vui lòng nhập thời điểm, vị trí trước và vị trí sau.');return;}
+ const iso=new Date(dt).toISOString();p.locationHistory[index]={...old,date:iso,from,to,note,editedAt:new Date().toISOString(),editedBy:managerSession?.user?.email||'ADMIN'};
+ // Cập nhật sự kiện diễn biến tương ứng; sự kiện cũ được nhận diện theo mốc thời gian và nội dung.
+ const events=Array.isArray(p.dienBienHangNgay)?p.dienBienHangNgay:[];
+ let ev=old.eventId?events.find(x=>x.id===old.eventId):null;
+ if(!ev)ev=events.find(x=>String(x.from||'')===String(old.from||'')&&String(x.to||'')===String(old.to||'')&&Math.abs(new Date(x.dateTime||0).getTime()-new Date(old.date||0).getTime())<5000);
+ if(ev){ev.dateTime=iso;ev.date=localDateKey(iso);ev.from=from;ev.to=to;ev.reason=note||'Đã chỉnh sửa lịch sử chuyển vị trí bởi ADMIN';ev.title='Đã chỉnh sửa lịch sử chuyển vị trí';ev.editedAt=new Date().toISOString();}
+ if(index===p.locationHistory.length-1)applyHistoryDestination(p,to,iso);
+ p.updated=new Date().toISOString();
+ try{const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:p.updated})});if(!r.ok)throw new Error(await r.text());closeModal('editTransferHistoryModal');await loadPeople();viewPerson(p.id);alert('Đã cập nhật lịch sử chuyển vị trí. Vị trí hiện tại được đồng bộ nếu đây là lần chuyển mới nhất.');}catch(err){showCloudError(err)}
+}
+async function deleteTransferHistory(personId,index){
+ if(!isAdmin()){alert('Chỉ ADMIN được xóa lịch sử chuyển vị trí.');return;}
+ const p=people.find(x=>String(x.id)===String(personId)),h=p?.locationHistory?.[index];if(!p||!h)return;
+ if(!confirm(`Xóa lịch sử chuyển vị trí này của ${p.ten}? Thao tác này không thể hoàn tác.`))return;
+ const wasLatest=index===p.locationHistory.length-1;
+ p.locationHistory.splice(index,1);
+ const events=Array.isArray(p.dienBienHangNgay)?p.dienBienHangNgay:[];
+ let ei=events.findIndex(x=>h.eventId&&x.id===h.eventId);
+ if(ei<0)ei=events.findIndex(x=>String(x.from||'')===String(h.from||'')&&String(x.to||'')===String(h.to||'')&&Math.abs(new Date(x.dateTime||0).getTime()-new Date(h.date||0).getTime())<5000);
+ if(ei>=0)events.splice(ei,1);
+ if(wasLatest){const prev=p.locationHistory[p.locationHistory.length-1];if(prev)applyHistoryDestination(p,prev.to,prev.date);else {p.trangthai='Đang quản lý';p.statusDate='';}}
+ p.updated=new Date().toISOString();
+ try{const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:p.updated})});if(!r.ok)throw new Error(await r.text());await loadPeople();viewPerson(p.id);alert('Đã xóa lịch sử chuyển vị trí và cập nhật dữ liệu.');}catch(err){showCloudError(err)}
 }
 function toggleTransferHospital(){const show=$('transferDestination').value==='Bệnh viện';$('transferHospitalWrap').style.display=show?'block':'none';$('transferHospitalName').required=show;}
 function openTransfer(id){
- if(!isManager()){alert('Bạn cần đăng nhập Quản lý để chuyển vị trí.');return;}
  const p=people.find(x=>String(x.id)===String(id));if(!p)return;
+ if(!canManagePerson(p)){alert('Bạn không có quyền chuyển vị trí hồ sơ ngoài phạm vi được giao.');return;}
  $('transferPersonId').value=id;$('transferPersonName').innerHTML=`Đối tượng: <b>${esc(p.ten)}</b> — Mã: <b>${esc(p.ma)}</b><br>Vị trí hiện tại: ${esc(locationText(p))}`;
  $('transferDestination').value='';$('transferHospitalName').value='';$('transferNote').value='';toggleTransferHospital();openModal('transferModal');
 }
 async function saveTransfer(e){
- e.preventDefault();if(!isManager()){alert('Bạn cần đăng nhập Quản lý.');return;}
+ e.preventDefault();
  const p=people.find(x=>String(x.id)===String($('transferPersonId').value));if(!p)return;
+ if(!canManagePerson(p)){alert('Bạn không có quyền chuyển vị trí hồ sơ ngoài phạm vi được giao.');return;}
  const dest=$('transferDestination').value;if(!dest){alert('Vui lòng chọn vị trí chuyển đến.');return;}
  if(dest==='Bệnh viện'&&!$('transferHospitalName').value.trim()){alert('Vui lòng nhập tên bệnh viện.');$('transferHospitalName').focus();return;}
  const label=x=>x.trangthai==='Chuyển đi nơi khác'?'Chuyển đi nơi khác':x.vitri==='Khu'?`Khu – ${x.nha||'Chưa chọn nhà'}`:x.vitri==='Bệnh viện'?`Bệnh viện${x.bvInfo?' – '+x.bvInfo:''}`:(x.vitri||'Chưa xác định');
  const from=label(p), now=new Date().toISOString(), note=$('transferNote').value.trim();
  if(dest==='Chuyển đi nơi khác'){p.trangthai='Chuyển đi nơi khác';p.statusDate=now.slice(0,10);}else{p.trangthai='Đang quản lý';p.statusDate='';if(dest.startsWith('Nhà ')){p.vitri='Khu';p.nha=dest;}else{p.vitri=dest;if(dest==='Bệnh viện')p.bvInfo=$('transferHospitalName').value.trim();}}
- p.ghiChuChuyen=note;p.locationHistory=p.locationHistory||[];const to=label(p);p.locationHistory.push({date:now,from,to,by:'Quản lý',note});p.updated=now;
+ p.ghiChuChuyen=note;p.locationHistory=p.locationHistory||[];const to=label(p);const historyId=uid();p.locationHistory.push({id:historyId,date:now,from,to,by:managerSession?.user?.email||'ADMIN',note});p.updated=now;
+ const dailyType=dest==='Chuyển đi nơi khác'?'decrease':'transfer';
+ const dailyEvent=makeDailyEvent({type:dailyType,title:dest==='Chuyển đi nơi khác'?'Giảm quân số — chuyển đi nơi khác':'Chuyển vị trí đối tượng',p,from,to,reason:note||'Chuyển theo thao tác quản lý',dateTime:now});dailyEvent.historyId=historyId;p.locationHistory[p.locationHistory.length-1].eventId=dailyEvent.id;appendDailyEvent(p,dailyEvent);
  try{const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:now})});if(!r.ok)throw new Error(await r.text());closeModal('transferModal');closeModal('detailModal');await loadPeople();alert('Đã chuyển vị trí và lưu lịch sử vào hồ sơ đối tượng.');}catch(err){showCloudError(err)}
 }
 
@@ -591,7 +854,7 @@ function formatDxDate(v){const d=parseDxDate(v);return d?d.toLocaleString('vi-VN
 function toggleDxReturnField(){const yes=$('dxStayed').checked;$('dxReturnWrap').style.display=yes?'block':'none';$('dxReturnDateTime').required=yes;}
 function openDxForm(id,dxId=null){
  const p=people.find(x=>x.id===id);if(!p)return;
- if(dxId&&!isManager()){alert('Chỉ Quản lý/Admin mới được chỉnh sửa lượt khám.');return;}
+ if(dxId&&!canManagePerson(p)){alert('Bạn không có quyền chỉnh sửa lượt khám của đối tượng này.');return;}
  const d=dxId?(p.khamDotXuat||[]).find(x=>String(x.id)===String(dxId)):null;
  $('dxPersonId').value=id;$('dxEditId').value=dxId||'';
  $('dxPersonName').innerHTML=`Đối tượng: <b>${esc(p.ten)}</b> — Mã: <b>${esc(p.ma)}</b>`;
@@ -604,7 +867,7 @@ function openDxForm(id,dxId=null){
 }
 async function saveDxForm(e){
  e.preventDefault();const id=$('dxPersonId').value,editId=$('dxEditId').value,p=people.find(x=>x.id===id);if(!p)return;
- if(editId&&!isManager()){alert('Chỉ Quản lý/Admin mới được chỉnh sửa lượt khám.');return;}
+ if(editId&&!canManagePerson(p)){alert('Bạn không có quyền chỉnh sửa lượt khám của đối tượng này.');return;}
  const dtLocal=$('dxDateTime').value,reason=$('dxReason').value.trim(),stayed=$('dxStayed').checked,returnAt=$('dxReturnDateTime').value;
  if(!dtLocal||!reason){alert('Vui lòng nhập đầy đủ ngày giờ và lý do khám.');return;}
  if(stayed&&!returnAt){alert('Vui lòng ghi ngày giờ trở về khu.');return;}
@@ -621,7 +884,7 @@ async function saveDxForm(e){
  }catch(err){showCloudError(err)}
 }
 async function deleteDx(dxId,personId=''){
- if(!isManager()){alert('Chỉ Quản lý/Admin mới được xóa lượt khám đột xuất.');return;}
+ if(!isAdmin()){alert('Chỉ ADMIN mới được xóa lượt khám đột xuất.');return;}
  if(!dxId)return;
  if(!confirm('Bạn có chắc muốn xóa lượt khám đột xuất này? Thao tác này không thể hoàn tác.'))return;
  try{
@@ -641,7 +904,7 @@ function openDxStats(){let all=people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({..
 function censusAge(p){return p.namsinh?new Date().getFullYear()-Number(p.namsinh):null;}
 function censusZoneForHouse(h){const n=Number(String(h||'').replace(/[^0-9]/g,''));if(n>=1&&n<=4)return 'elderly';if(n>=5&&n<=9)return 'homeless';if(n>=10&&n<=11)return 'mental';return '';}
 function censusZoneName(z){return ({elderly:'Khu Chăm sóc nuôi dưỡng Người cao tuổi',homeless:'Khu Chăm sóc nuôi dưỡng Người lang thang',mental:'Khu Chăm sóc nuôi dưỡng Người bệnh tâm thần',medical:'Khu Y tế'})[z]||'Các khu';}
-function censusListForZone(z){const a=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý');if(z==='medical')return a.filter(p=>currentLocation(p)==='Phòng Y tế');return a.filter(p=>currentLocation(p)==='Khu'&&censusZoneForHouse(p.nha)===z);}
+function censusListForZone(z){const a=people.filter(isCurrentlyManaged);if(z==='medical')return a.filter(p=>currentLocation(p)==='Phòng Y tế');return a.filter(p=>currentLocation(p)==='Khu'&&censusZoneForHouse(p.nha)===z);}
 function showKhuPanel(){hideDashboardList();const panel=$('censusPanel');panel.style.display='block';renderCensusHome();panel.scrollIntoView({behavior:'smooth',block:'start'});}
 function hideCensusPanel(){$('censusPanel').style.display='none';}
 function renderCensusHome(){
@@ -672,20 +935,20 @@ function openCensusZone(z){
   const list=censusListForZone('medical');pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName} — ${list.length} đối tượng</h3>${censusStatsHtml(list)}${censusPeopleHtml(list)}`;return;
  }
  const all=censusListForZone(z);
- pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName}</h3><div class="census-house-list">${houses.map(n=>{const list=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()==='Nhà '+n);return `<button class="census-zone" onclick="openCensusHouse(${n})"><b>Nhà ${n}</b><span>${list.length} đối tượng</span></button>`}).join('')}</div>
+ pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName}</h3><div class="census-house-list">${houses.map(n=>{const list=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()==='Nhà '+n);return `<button class="census-zone" onclick="openCensusHouse(${n})"><b>Nhà ${n}</b><span>${list.length} đối tượng</span></button>`}).join('')}</div>
  <div class="section">Danh sách đối tượng theo tiêu chí</div>${censusStatsHtml(all,null,z)}
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button class="btn green" onclick="exportSchedule('zone','${z}','csv')">Xuất lịch tái khám Excel (CSV)</button><button class="btn blue" onclick="exportSchedule('zone','${z}','pdf')">Xuất lịch tái khám PDF / In</button></div>
  <div id="zoneFilteredPeople">${censusPeopleHtml(all)}</div>`;
 }
 function filterCensusZone(z,key){censusZoneFilter=key;const all=censusListForZone(z);const filters={male:p=>p.gioitinh==='Nam',female:p=>p.gioitinh==='Nữ',over60:p=>censusAge(p)>60,under60:p=>censusAge(p)!==null&&censusAge(p)<60,disabled:p=>p.khuyettat==='Có',med:p=>isTakingMedicine(p),review:p=>!!p.ngayTaiKham};const list=key==='all'?all:all.filter(filters[key]||(()=>true));const el=$('zoneFilteredPeople');if(el)el.innerHTML=censusPeopleHtml(list);}
-function censusStatsHtml(list,n,zoneKey=''){const active=list.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý');const tile=(label,count,key)=>`<button type="button" class="census-mini" style="border:0;cursor:pointer;font:inherit" onclick="${zoneKey?`filterCensusZone('${zoneKey}','${key}')`:`filterCensusHouse(${n},'${key}')`}"><span>${label}</span><b>${count}</b></button>`;return `<div class="census-stats">${tile('Tổng đang quản lý',active.length,'all')}${tile('Nam',active.filter(p=>p.gioitinh==='Nam').length,'male')}${tile('Nữ',active.filter(p=>p.gioitinh==='Nữ').length,'female')}${tile('Trên 60 tuổi',active.filter(p=>censusAge(p)>60).length,'over60')}${tile('Dưới 60 tuổi',active.filter(p=>censusAge(p)!==null&&censusAge(p)<60).length,'under60')}${tile('Khuyết tật',active.filter(p=>p.khuyettat==='Có').length,'disabled')}${tile('Đang uống thuốc',active.filter(isTakingMedicine).length,'med')}${tile('Huyết áp',active.filter(p=>p.thuocHA).length,'ha')}${tile('Tâm thần',active.filter(p=>p.thuocTT).length,'mental')}${tile('Bệnh khác',active.filter(p=>p.thuocKhac).length,'other')}${tile('Lịch tái khám',active.filter(p=>p.ngayTaiKham).length,'review')}</div>`;}
-function censusPeopleHtml(list){return list.length?list.map(p=>`<div class="census-person"><b>${esc(p.ten||'')}</b> — Mã: ${esc(p.ma||'')}<br><span>Giới tính: ${esc(p.gioitinh||'Chưa cập nhật')} · Năm sinh: ${esc(p.namsinh||'Chưa cập nhật')} · Thuốc: ${esc(meds(p))}</span><br><span>Trạng thái: ${esc(p.trangthai||'Đang quản lý')} · Khám đột xuất: ${(p.khamDotXuat||[]).length} lượt</span><br><span><b>Lịch tái khám:</b> ${esc(formatDateVN(p.ngayTaiKham)||'Chưa có lịch')}</span><br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button>${isManager()?` <button class="btn red" onclick="delPerson('${p.id}')">Xóa</button>`:''}</div>`).join(''):'<div class="notice">Chưa có đối tượng tại vị trí này.</div>';}
+function censusStatsHtml(list,n,zoneKey=''){const active=list.filter(p=>isCurrentlyManaged(p));const tile=(label,count,key)=>`<button type="button" class="census-mini" style="border:0;cursor:pointer;font:inherit" onclick="${zoneKey?`filterCensusZone('${zoneKey}','${key}')`:`filterCensusHouse(${n},'${key}')`}"><span>${label}</span><b>${count}</b></button>`;return `<div class="census-stats">${tile('Tổng đang quản lý',active.length,'all')}${tile('Nam',active.filter(p=>p.gioitinh==='Nam').length,'male')}${tile('Nữ',active.filter(p=>p.gioitinh==='Nữ').length,'female')}${tile('Trên 60 tuổi',active.filter(p=>censusAge(p)>60).length,'over60')}${tile('Dưới 60 tuổi',active.filter(p=>censusAge(p)!==null&&censusAge(p)<60).length,'under60')}${tile('Khuyết tật',active.filter(p=>p.khuyettat==='Có').length,'disabled')}${tile('Đang uống thuốc',active.filter(isTakingMedicine).length,'med')}${tile('Huyết áp',active.filter(p=>p.thuocHA).length,'ha')}${tile('Tâm thần',active.filter(p=>p.thuocTT).length,'mental')}${tile('Bệnh khác',active.filter(p=>p.thuocKhac).length,'other')}${tile('Lịch tái khám',active.filter(p=>p.ngayTaiKham).length,'review')}</div>`;}
+function censusPeopleHtml(list){return list.length?list.map(p=>`<div class="census-person"><b>${esc(p.ten||'')}</b> — Mã: ${esc(p.ma||'')}<br><span>Giới tính: ${esc(p.gioitinh||'Chưa cập nhật')} · Năm sinh: ${esc(p.namsinh||'Chưa cập nhật')} · Thuốc: ${esc(meds(p))}</span><br><span>Trạng thái: ${esc(p.trangthai||'Đang quản lý')} · Khám đột xuất: ${(p.khamDotXuat||[]).length} lượt</span><br><span><b>Lịch tái khám:</b> ${esc(formatDateVN(p.ngayTaiKham)||'Chưa có lịch')}</span><br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button>${isAdmin()?` <button class="btn red" onclick="delPerson('${p.id}')">Xóa</button>`:''}</div>`).join(''):'<div class="notice">Chưa có đối tượng tại vị trí này.</div>';}
 let censusHouseFilter='all';
 let censusDxSearchOpen=false;
 function filterCensusHouse(n,key){censusHouseFilter=key;renderCensusHouse(n,$('censusContent').querySelector('.house-search')?.value||'');}
 function renderCensusHouseDxSearch(n, query=''){
  const house='Nhà '+n, q=String(query||'').trim().toLocaleLowerCase('vi');
- const all=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+ const all=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
  const matches=q?all.filter(p=>String(p.ten||'').toLocaleLowerCase('vi').includes(q)||String(p.ma||'').toLocaleLowerCase('vi').includes(q)):[];
  const el=$('houseDxSearchResults');if(!el)return;
  el.innerHTML=!q?'<div class="notice">Nhập tên hoặc mã đối tượng để chọn người cần khám đột xuất.</div>':(matches.length?matches.map(p=>`<div class="census-person"><b>${esc(p.ten||'')}</b> — Mã: ${esc(p.ma||'')}<br><button class="btn purple" onclick="openDxForm('${p.id}')">Chọn khám đột xuất</button></div>`).join(''):'<div class="notice">Không tìm thấy đối tượng trong nhà này.</div>');
@@ -694,7 +957,7 @@ function toggleCensusHouseDx(n){censusDxSearchOpen=!censusDxSearchOpen;renderCen
 function filterCensusHouse(n,key){censusHouseFilter=key;renderCensusHouse(n,$('censusContent').querySelector('.house-search')?.value||'');}
 function renderCensusHouse(n, query=''){
  const house='Nhà '+n;
- const all=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+ const all=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
  const q=String(query||'').trim().toLocaleLowerCase('vi');
  let list=q?all.filter(p=>String(p.ten||'').toLocaleLowerCase('vi').includes(q)||String(p.ma||'').toLocaleLowerCase('vi').includes(q)):all;
  const filters={male:p=>p.gioitinh==='Nam',female:p=>p.gioitinh==='Nữ',over60:p=>censusAge(p)>60,under60:p=>censusAge(p)!==null&&censusAge(p)<60,disabled:p=>p.khuyettat==='Có',med:p=>isTakingMedicine(p),ha:p=>p.thuocHA,mental:p=>p.thuocTT,other:p=>p.thuocKhac,review:p=>!!p.ngayTaiKham};if(censusHouseFilter!=='all'&&filters[censusHouseFilter])list=list.filter(filters[censusHouseFilter]);
@@ -711,7 +974,7 @@ function personReviewHistory(p){
 function showHouseReviewPanel(n, query=''){
   const house='Nhà '+n;
   const host=$('houseReviewPanel'); if(!host)return;
-  const all=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+  const all=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
   const q=String(query||'').trim().toLocaleLowerCase('vi');
   const list=q?all.filter(p=>String(p.ten||'').toLocaleLowerCase('vi').includes(q)||String(p.ma||'').toLocaleLowerCase('vi').includes(q)):all;
   host.innerHTML=`<div class="census-panel" style="margin-top:12px">
@@ -724,8 +987,8 @@ function showHouseReviewPanel(n, query=''){
       return `<div class="census-person">
         <b>${esc(p.ten||'')}</b> — Mã: ${esc(p.ma||'')} · ${esc(p.namsinh||'')}
         <div>Ngày tái khám mới nhất: <strong>${latest?esc(formatDateVN(latest)):'Chưa có lịch'}</strong></div>
-        <button class="btn green" type="button" onclick="showPersonReviewForm(${n},'${String(p.id).replace(/'/g,"\\'")}')">＋ Nhập lịch tái khám</button>
-        <button class="btn blue" type="button" onclick="togglePersonReviewHistory('${String(p.id).replace(/'/g,"\\'")}',${n})">Xem lịch sử (${history.length})</button>
+        <button class="btn green" type="button" onclick="showPersonReviewForm(${n},'${String(p.id).replace(/'/g,"\'")}')">＋ Nhập lịch tái khám</button>
+        <button class="btn blue" type="button" onclick="togglePersonReviewHistory('${String(p.id).replace(/'/g,"\'")}',${n})">Xem lịch sử (${history.length})</button>
         <div id="reviewHistory_${esc(String(p.id))}" style="margin-top:6px"></div>
         <div id="reviewForm_${esc(String(p.id))}"></div>
       </div>`;
@@ -735,8 +998,7 @@ function showHouseReviewPanel(n, query=''){
 function showPersonReviewForm(n,id){
   const p=people.find(x=>String(x.id)===String(id)); const host=$('reviewForm_'+id);
   if(!p||!host)return;
-  if(!isManager()){alert('Chị cần đăng nhập Quản lý để lưu lịch tái khám.');return;}
-  host.innerHTML=`<form onsubmit="savePersonReview(event,${n},'${String(p.id).replace(/'/g,"\\'")}')" style="border:1px solid #cbd5e1;border-radius:8px;padding:10px;margin-top:8px">
+  host.innerHTML=`<form onsubmit="savePersonReview(event,${n},'${String(p.id).replace(/'/g,"\'")}')" style="border:1px solid #cbd5e1;border-radius:8px;padding:10px;margin-top:8px">
     <div class="field"><label>Ngày tái khám mới *</label><input name="reviewDate" type="date" required></div>
     <div class="field" style="margin-top:8px"><label>Ghi chú (không bắt buộc)</label><input name="reviewNote" placeholder="Ví dụ: tái khám theo hẹn"></div>
     <div class="actions"><button class="btn gray" type="button" onclick="$('reviewForm_${esc(String(p.id))}').innerHTML=''">Hủy</button><button class="btn green" type="submit">Lưu vào hồ sơ</button></div>
@@ -746,40 +1008,31 @@ function togglePersonReviewHistory(id,n){
   const p=people.find(x=>String(x.id)===String(id));const host=$('reviewHistory_'+id);if(!p||!host)return;
   if(host.dataset.open==='1'){host.innerHTML='';host.dataset.open='0';return;}
   const history=personReviewHistory(p);
-  host.innerHTML=history.length?`<div class="dx-list">${history.map((item,i)=>`<div class="dx-item"><b>${esc(formatDateVN(item.date||''))}</b>${item.note?`<br>${esc(item.note)}`:''}${item.createdAt?`<br><small>Ngày nhập: ${esc(new Date(item.createdAt).toLocaleString('vi-VN'))}</small>`:''}${isManager()&&item.id?`<br><button class="btn red" onclick="deletePersonReview('${String(p.id).replace(/'/g,"\\'")}','${String(item.id).replace(/'/g,"\\'")}',${n})">Xóa lượt này</button>`:''}</div>`).join('')}</div>`:'<div class="notice">Chưa có lịch sử tái khám.</div>';
+  host.innerHTML=history.length?`<div class="dx-list">${history.map((item,i)=>`<div class="dx-item"><b>${esc(formatDateVN(item.date||''))}</b>${item.note?`<br>${esc(item.note)}`:''}${item.createdAt?`<br><small>Ngày nhập: ${esc(new Date(item.createdAt).toLocaleString('vi-VN'))}</small>`:''}${isAdmin()&&item.id&&/^\d+$/.test(String(item.id))?`<br><button class="btn red" onclick="deletePersonReview('${String(p.id).replace(/'/g,"\'")}','${String(item.id).replace(/'/g,"\'")}',${n})">Xóa lượt này</button>`:''}</div>`).join('')}</div>`:'<div class="notice">Chưa có lịch sử tái khám.</div>';
   host.dataset.open='1';
 }
 async function savePersonReview(e,n,id){
   e.preventDefault();
-  if(!isManager()){alert('Chị cần đăng nhập Quản lý để lưu lịch tái khám.');return;}
   const p=people.find(x=>String(x.id)===String(id));if(!p)return;
+  if(isManager()&&!canManagePerson(p)){alert('Bạn không có quyền nhập lịch tái khám ngoài phạm vi được giao.');return;}
   const house='Nhà '+n;
   if(String(p.nha||'').trim()!==house||currentLocation(p)!=='Khu'){alert('Đối tượng không còn ở '+house+'. Vui lòng tải lại danh sách.');return;}
   const form=e.target;const date=form.elements.reviewDate.value;const note=form.elements.reviewNote.value.trim();
   if(!date){alert('Vui lòng nhập ngày tái khám.');return;}
-  const oldHistory=Array.isArray(p.lichTaiKham)?p.lichTaiKham.slice():(p.ngayTaiKham?[{date:String(p.ngayTaiKham).slice(0,10),note:'Lịch cũ trong hồ sơ'}]:[]);
-  oldHistory.push({id:uid(),date,note,createdAt:new Date().toISOString()});
-  p.lichTaiKham=oldHistory;
-  p.ngayTaiKham=oldHistory.map(x=>String(x.date||'').slice(0,10)).filter(Boolean).sort().at(-1)||date;
-  p.updated=new Date().toISOString();
   try{
-    const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:p.updated})});
+    const r=await api('lich_tai_kham',{method:'POST',headers:headers({'Prefer':'return=minimal'}),body:JSON.stringify({person_id:String(p.id),review_date:date,note,created_by:managerSession?.user?.id||null})});
     if(!r.ok)throw new Error(await r.text());
     await loadPeople();
     renderCensusHouse(n,$('censusContent').querySelector('.house-search')?.value||'');
     showHouseReviewPanel(n);
-    alert('Đã lưu lượt tái khám vào hồ sơ đối tượng. Lịch sử cũ vẫn được giữ lại.');
+    alert('Đã lưu lượt tái khám. Hồ sơ đối tượng chính không bị chỉnh sửa.');
   }catch(err){showCloudError(err)}
 }
 async function deletePersonReview(id,reviewId,n){
-  if(!isManager()){alert('Chị cần đăng nhập Quản lý.');return;}
-  const p=people.find(x=>String(x.id)===String(id));if(!p)return;
+  if(!isAdmin()){alert('Chỉ ADMIN mới được xóa lịch tái khám.');return;}
   if(!confirm('Xóa riêng lượt tái khám này?'))return;
-  p.lichTaiKham=(Array.isArray(p.lichTaiKham)?p.lichTaiKham:[]).filter(x=>String(x.id)!==String(reviewId));
-  p.ngayTaiKham=p.lichTaiKham.map(x=>String(x.date||'').slice(0,10)).filter(Boolean).sort().at(-1)||'';
-  p.updated=new Date().toISOString();
   try{
-    const r=await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:p.updated})});
+    const r=await api('lich_tai_kham?id=eq.'+encodeURIComponent(reviewId),{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
     if(!r.ok)throw new Error(await r.text());
     await loadPeople();renderCensusHouse(n,$('censusContent').querySelector('.house-search')?.value||'');showHouseReviewPanel(n);alert('Đã xóa lượt tái khám đã chọn.');
   }catch(err){showCloudError(err)}
@@ -787,7 +1040,7 @@ async function deletePersonReview(id,reviewId,n){
 
 function exportSchedule(scope,id,format){
  const label=scope==='house'?'Nhà '+id:censusZoneName(id);
- let list=scope==='house'?people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===label):censusListForZone(id);
+ let list=scope==='house'?people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===label):censusListForZone(id);
  const rows=list.flatMap(p=>{
    const history=personReviewHistory(p);
    return history.map(item=>({ngay:item.date||'',ten:p.ten||'',ma:p.ma||'',nha:p.nha||'',vitri:locationText(p),thuoc:meds(p),tinhTrang:p.tinhTrang||'',ghiChu:item.note||''}));
@@ -805,7 +1058,7 @@ function exportCensusHouseReport(n){
  const house='Nhà '+n;const period=$('censusReportPeriod')?.value||'month';const now=new Date();const start=new Date(now);
  if(period==='week')start.setDate(start.getDate()-6);else if(period==='month')start.setMonth(start.getMonth()-1);else if(period==='6months')start.setMonth(start.getMonth()-6);else start.setFullYear(start.getFullYear()-1);
  const periodName=({week:'7 ngày gần nhất',month:'1 tháng gần nhất','6months':'6 tháng gần nhất',year:'1 năm gần nhất'})[period];
- const rows=people.filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý'&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+ const rows=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
  const inPeriod=value=>{if(!value)return false;const d=new Date(value);return !Number.isNaN(d.getTime())&&d>=start&&d<=now;};
  const over60=rows.filter(p=>censusAge(p)>60).length;
  const under60=rows.filter(p=>censusAge(p)!==null&&censusAge(p)<60).length;
@@ -834,13 +1087,13 @@ function showDashboardList(type){
  }else if(['all','Phòng Y tế','Ph·ng Y t?','Bệnh viện'].includes(type)){
   const normalizedType=type==='Ph·ng Y t?'?'Phòng Y tế':type;
   title=type==='all'?'Tất cả đối tượng':normalizedType==='Phòng Y tế'?'Danh sách đối tượng tại Y tế':'Danh sách đối tượng tại Bệnh viện';
-  const list=(type==='all'?people:people.filter(p=>currentLocation(p)===normalizedType)).filter(p=>(p.trangthai||'Đang quản lý')==='Đang quản lý');
+  const list=(type==='all'?people:people.filter(p=>currentLocation(p)===normalizedType)).filter(p=>isCurrentlyManaged(p));
   html=list.length?list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Vị trí: ${esc(locationText(p))}<br>Khuyết tật: ${esc(p.khuyettat||'Chưa cập nhật')}<br>Tình trạng: ${esc(p.tinhTrang||'—')}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join(''):'Chưa có đối tượng đang quản lý trong mục này.';
  }else if(type==='med'){
   title='Danh sách người đang uống thuốc';const list=people.filter(isTakingMedicine);html=list.map(p=>`<div class="dx-item"><b>${esc(p.ten)}</b> — ${esc(p.ma)}<br>Thuốc: ${esc(meds(p))}<br><button class="btn blue" onclick="viewPerson('${p.id}')">Xem hồ sơ</button></div>`).join('');if(!html)html='Chưa có dữ liệu trong mục này.';
  }else{
   title=type==='dxweek'?'Danh sách khám đột xuất tuần này':'Danh sách khám đột xuất';const list=type==='dxweek'?weeklyDx():people.flatMap(p=>(p.khamDotXuat||[]).map(d=>({...d,name:p.ten,ma:p.ma,personId:p.id})));
-  html=list.map(d=>`<div class="dx-item"><b>${esc(d.dateTime||'')}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}<br><button class="btn gray" onclick="viewPerson('${d.personId||''}')">Xem hồ sơ</button>${isManager()&&d.id?` <button class="btn blue" onclick="openDxForm('${d.personId||''}','${d.id}')">Sửa lượt khám</button> <button class="btn red" onclick="deleteDx('${d.id}','${d.personId||''}')">Xóa lượt khám</button>`:''}</div>`).join('');if(!html)html='Chưa có dữ liệu trong mục này.';
+  html=list.map(d=>`<div class="dx-item"><b>${esc(d.dateTime||'')}</b> — ${esc(d.name)} (${esc(d.ma)})<br>Lý do: ${esc(d.reason)}<br>Hướng xử lý: ${esc(dxActionText(d.action))}<br><button class="btn gray" onclick="viewPerson('${d.personId||''}')">Xem hồ sơ</button>${canManagePerson(people.find(p=>String(p.id)===String(d.personId)))&&d.id?` <button class="btn blue" onclick="openDxForm('${d.personId||''}','${d.id}')">Sửa lượt khám</button>`:''}${isAdmin()&&d.id?` <button class="btn red" onclick="deleteDx('${d.id}','${d.personId||''}')">Xóa lượt khám</button>`:''}</div>`).join('');if(!html)html='Chưa có dữ liệu trong mục này.';
  }
  $('dashboardListTitle').textContent=title;$('dashboardListBody').innerHTML=html;$('dashboardList').style.display='grid';$('dashboardList').scrollIntoView({behavior:'smooth',block:'start'});
 }
