@@ -72,6 +72,13 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 .meal-card{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:linear-gradient(135deg,#f0fbf3,#dff4e5);border:1px solid #a9d9b6;border-left:5px solid #27ae60;border-radius:12px;padding:14px 16px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
 .meal-card h2{margin:0 0 4px;color:#216e39;font-size:20px}.meal-card p{margin:0;color:#4c6653;font-size:13px}.meal-actions{display:flex;gap:8px;flex-wrap:wrap}.meal-file-link{display:inline-block;max-width:100%;overflow-wrap:anywhere;margin-top:8px;font-weight:700;color:#216e39}
 .meal-preview{max-width:100%;max-height:55vh;object-fit:contain;border:1px solid #d8e5dc;border-radius:8px;background:#f8faf9}.meal-status{margin-top:10px;padding:10px;background:#f5faf6;border-radius:8px}
+/* Bảng báo cáo quân số theo mẫu in */
+.census-report-wrap{width:100%;overflow-x:auto;margin:12px 0 18px;background:#fff}
+.census-report{width:100%;border-collapse:collapse;min-width:680px;font-family:"Times New Roman",serif;color:#111}
+.census-report th,.census-report td{border:1px solid #333;padding:8px 7px;text-align:center;font-family:"Times New Roman",serif;font-size:15px}
+.census-report th{background:#fff;color:#111;font-weight:700;position:static}
+.census-report td:nth-child(2){text-align:left;font-weight:700}
+.census-report td:nth-child(3){font-weight:700;font-size:17px}
 /* Báo cáo diễn biến hằng ngày */
 .daily-report{background:#fff;border:1px solid #d7e2eb;border-top:4px solid #347f99;border-radius:12px;padding:14px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
 .daily-report-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -83,6 +90,18 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 .daily-event .movement{font-weight:700;margin:5px 0}
 .daily-event.increase{border-left-color:#27ae60}.daily-event.decrease{border-left-color:#e74c3c}.daily-event.transfer{border-left-color:#8e44ad}
 @media(max-width:700px){.daily-report-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Cán bộ quản lý nhà hôm nay */
+.duty-panel{background:#fff;border:1px solid #d7e2eb;border-top:4px solid #2e8b57;border-radius:12px;padding:14px;margin:0 0 16px;box-shadow:0 2px 7px #0000000b}
+.duty-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.duty-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:12px 0}.duty-choice{border:1px solid #dce5ec;border-radius:9px;padding:10px;background:#f8fbfd;min-width:0}.duty-choice label{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}.duty-choice input[type=checkbox]{width:auto}.duty-name{display:none;margin-top:8px}.duty-name.show{display:block}.duty-results{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}.duty-result{border:1px solid #b9ddc5;border-left:4px solid #2e8b57;border-radius:8px;padding:10px;background:#f3fbf5;overflow-wrap:anywhere}.duty-result b{display:block;color:#216e39}.duty-result span{display:block;margin-top:4px}.duty-empty{padding:12px;background:#f7f8fa;border-radius:8px;color:#64748b}
+.duty-house-label{display:block;margin-top:6px;padding:5px 7px;border-radius:6px;background:#eaf7ee;color:#216e39;font-size:12px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+.duty-house-label.empty{background:#f3f4f6;color:#64748b;font-weight:400}
+.duty-house-inline{margin:10px 0 12px;padding:10px 12px;border:1px solid #b9ddc5;border-left:4px solid #2e8b57;border-radius:8px;background:#f3fbf5}
+
+@media(max-width:700px){.duty-grid,.duty-results{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+.report-signature-input{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin:24px 8px 8px auto;max-width:360px;break-inside:avoid}.report-signature-input label{font-weight:700;text-align:right}.report-signature-input input{max-width:320px;text-align:left}@media print{.report-signature-input input{border:0;border-bottom:1px solid #333;border-radius:0;background:transparent;padding:4px 0}.report-signature-input label{display:block}}
 </style>
 <link rel="manifest" href="./manifest.json"><meta name="theme-color" content="#2c3e50"><meta name="app-permission-revision" content="2026-10-13-r1"></head>
 <body>
@@ -97,16 +116,64 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
   <button class="home-nav bv-nav" onclick="showDashboardList('Bệnh viện')"><span class="nav-caption">BỆNH VIỆN</span><strong class="nav-count" id="homeCountBv">0</strong><span class="nav-subtitle" id="bvBreakdown">0 Nam · 0 Nữ · 0 Khuyết tật</span></button>
 </div>
 <div class="home-actions">
-  <button class="btn green manager-only" style="display:none" onclick="openPerson()">＋ Thêm đối tượng</button>
+  <button class="btn green manager-add-only" style="display:none" onclick="openPerson()">＋ Thêm đối tượng</button>
   <input id="search" class="search" placeholder="Tìm theo tên đối tượng..." oninput="render()">
 </div>
+<section id="dutyPanel" class="duty-panel" style="display:none">
+  <div class="duty-head"><h2 style="margin:2px 0">👥 Cán bộ quản lý nhà hôm nay</h2><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span id="dutyTodayLabel" style="color:#64748b;font-size:13px"></span><button type="button" class="btn gray" onclick="toggleDutyPanel(false)">Đóng</button></div></div>
+  <div id="dutyChecklist" class="duty-grid"></div>
+  <div style="display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap"><button type="button" class="btn gray" onclick="resetDutyForm()">Bỏ chọn nhà mới</button><button type="button" class="btn green" onclick="saveDutyRoster()">💾 Lưu cán bộ hôm nay</button></div>
+  <div class="section">Phân công hôm nay</div>
+  <div id="dutyResults"></div>
+  <div class="section">📝 Sổ nhận ca – bàn giao ca</div>
+  
+  <form id="handoverForm" onsubmit="saveHandoverRecord(event)" style="border:1px solid #d7e4ec;border-radius:10px;padding:12px;margin-top:10px">
+    <div class="duty-grid">
+      <div><label for="handoverLocation">Nhà / phạm vi</label><select id="handoverLocation" required style="width:100%"></select></div>
+      <div><label for="handoverDate">Ngày</label><input id="handoverDate" type="date" readonly style="width:100%;background:#f3f4f6"></div>
+      <div><label for="handoverFrom">Cán bộ bàn giao</label><input id="handoverFrom" required maxlength="120" placeholder="Họ tên người giao ca" style="width:100%"></div>
+      <div><label>Người nhận ca</label><div style="padding:10px;border:1px dashed #b9ddc5;border-radius:6px;background:#f3fbf5;color:#216e39">Người nhận sẽ tự nhập tên và xác nhận tại mục lịch sử sau khi người giao lưu bàn giao.</div><input id="handoverTo" type="hidden" value=""></div>
+    </div>
+    <label style="margin-top:10px">Giờ bàn giao</label>
+    <div class="duty-grid" style="grid-template-columns:repeat(auto-fit,minmax(105px,1fr));margin:6px 0 10px">
+      <label><input type="radio" name="handoverTimeChoice" value="07:30"> 07:30</label>
+      <label><input type="radio" name="handoverTimeChoice" value="11:30" checked> 11:30</label>
+      <label><input type="radio" name="handoverTimeChoice" value="13:00"> 13:00</label>
+      <label><input type="radio" name="handoverTimeChoice" value="17:00"> 17:00</label>
+      <label><input type="radio" name="handoverTimeChoice" value="custom"> Giờ khác</label>
+    </div>
+    <div id="handoverCustomTimeWrap" style="display:none;max-width:240px"><label for="handoverCustomTime">Thời gian thực tế</label><input id="handoverCustomTime" type="time" value="12:00" style="width:100%"></div>
+    <div class="duty-grid" style="margin-top:10px">
+      <div><label for="handoverAntt">ANTT – An ninh trật tự</label><select id="handoverAntt" style="width:100%" onchange="toggleHandoverNote('handoverAntt','handoverAnttNoteWrap')"><option value="Ổn định">Ổn định</option><option value="Khác">Khác – Có tình hình cần lưu ý</option></select><div id="handoverAnttNoteWrap" style="display:none;margin-top:6px"><label for="handoverAnttNote">Nội dung ANTT</label><textarea id="handoverAnttNote" rows="2" placeholder="Ghi tình hình cần bàn giao" style="width:100%"></textarea></div></div>
+      <div><label for="handoverSkdt">SKĐT – Sức khỏe, diễn biến đối tượng</label><select id="handoverSkdt" style="width:100%" onchange="toggleHandoverNote('handoverSkdt','handoverSkdtNoteWrap')"><option value="Ổn định">Ổn định</option><option value="Khác">Khác – Có tình hình cần lưu ý</option></select><div id="handoverSkdtNoteWrap" style="display:none;margin-top:6px"><label for="handoverSkdtNote">Nội dung SKĐT</label><textarea id="handoverSkdtNote" rows="2" placeholder="Ghi tình trạng sức khỏe/diễn biến cần lưu ý" style="width:100%"></textarea></div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn green" type="submit">💾 Lưu bàn giao ca</button></div>
+  </form>
+  <div class="section" id="handoverHistoryTitle">Lịch sử nhận ca – bàn giao hôm nay</div>
+  <div id="handoverHistoryFilters" style="border:1px solid #d7e4ec;border-radius:10px;padding:10px;margin:8px 0;background:#f8fbfd">
+    <div style="font-weight:700;margin-bottom:8px">🔎 Lọc lịch sử theo nhà/khu vực (chọn một mục để xem gọn)</div>
+    <div id="handoverLocationFilterButtons" style="display:flex;gap:6px;flex-wrap:wrap"></div>
+  </div>
+  <div id="adminHandoverHistoryTools" style="display:none;border:1px solid #d7e4ec;border-radius:10px;padding:10px;margin:8px 0">
+    <label for="adminHandoverHistoryDate">ADMIN xem lịch sử theo ngày</label>
+    <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap">
+      <input id="adminHandoverHistoryDate" type="date" style="max-width:220px">
+      <button type="button" class="btn blue" onclick="loadHandoverHistory(document.getElementById('adminHandoverHistoryDate').value)">Xem lịch sử ngày đã chọn</button>
+      <button type="button" class="btn gray" onclick="showTodayHandoverHistory()">Về hôm nay</button>
+    </div>
+    
+  </div>
+  <div id="handoverHistory"><div class="duty-empty">Đang tải lịch sử bàn giao…</div></div>
+  
+</section>
 <section id="dailyReportPanel" class="daily-report" style="display:none">
   <div class="daily-report-head"><h2 style="margin:2px 0">📋 Báo cáo diễn biến hằng ngày</h2><button class="btn gray" onclick="closeDailyReport()">Đóng</button></div>
-  <p style="margin:6px 0;color:#64748b">Tự tổng hợp từ các lần thêm/sửa hồ sơ và chuyển vị trí đã lưu trên hệ thống. Chọn ngày để xem đầy đủ danh sách đối tượng và diễn biến.</p>
+  
   <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:12px 0">
     <div style="min-width:180px;flex:1"><label for="dailyReportDate">Ngày báo cáo</label><input id="dailyReportDate" type="date" onchange="renderDailyReport()"></div>
     <button class="btn blue" onclick="renderDailyReport()">Xem báo cáo</button>
     <button class="btn green" onclick="printDailyReport()">Xuất báo cáo / Lưu PDF</button>
+    <button class="btn purple" onclick="exportDailyReportFile()">Xuất file Excel (CSV)</button>
   </div>
   <div id="dailyReportContent"></div>
 </section>
@@ -146,9 +213,15 @@ table{width:100%;border-collapse:collapse;min-width:1000px}th,td{padding:10px;bo
 <button class="close" onclick="closeModal('loginModal')">×</button>
 <h2>☰ Menu</h2>
 <div style="margin:12px 0 16px"><button type="button" class="btn green" style="width:100%;min-height:46px" onclick="openMealModal()">🍲 Thực đơn hôm nay</button></div>
-  <div style="margin:0 0 16px"><button type="button" class="btn blue" style="width:100%;min-height:46px" onclick="closeModal('loginModal');openDailyReport()">📋 Diễn biến hằng ngày</button><small style="display:block;color:#64748b;margin-top:5px">Báo cáo tăng giảm quân số, chuyển đi/chuyển đến, hồi gia và tử vong</small></div>
+  <div style="margin:0 0 16px"><button type="button" class="btn blue" style="width:100%;min-height:46px" onclick="closeModal('loginModal');openDailyReport()">📋 Diễn biến hằng ngày</button></div>
+  <div style="margin:0 0 16px"><button type="button" class="btn green" id="openDutyPanelBtn" style="width:100%;min-height:46px" onclick="closeModal('loginModal');toggleDutyPanel(true)">👥 Cán bộ quản lý nhà hôm nay</button></div>
 <p class="notice">Tài khoản này dùng để thêm, sửa và xóa hồ sơ. Nhân viên bình thường không cần đăng nhập.</p>
-<div id="accountStatus" class="notice" style="display:none"></div><div id="accountAdminArea" style="display:none;margin:10px 0"><button type="button" class="btn dark" onclick="openAdminAccountInfo()">⚙️ Quản lý tài khoản</button></div>
+<div id="accountStatus" class="notice" style="display:none"></div>
+<div id="accountSessionActions" style="display:none;margin:10px 0;gap:8px;flex-wrap:wrap">
+  <button type="button" class="btn blue" style="width:100%;min-height:44px" onclick="closeModal('loginModal');openModal('passwordModal')">🔐 Đổi mật khẩu tài khoản đang đăng nhập</button>
+  <button type="button" class="btn red" style="width:100%;min-height:44px" onclick="logout();closeModal('loginModal')">↪ Đăng xuất tài khoản</button>
+</div>
+<div id="accountAdminArea" style="display:none;margin:10px 0"><button type="button" class="btn dark" onclick="openAdminAccountInfo()">⚙️ Quản lý tài khoản</button></div>
 <div id="loginRoleChooser" class="field" style="margin:12px 0">
 <label>Chọn loại tài khoản</label>
 <select id="loginRoleType" onchange="toggleLoginHouse()">
@@ -403,11 +476,12 @@ function openAccountMenu(){
   $('accountStatus').style.display='block';
   $('accountStatus').innerHTML='Đã đăng nhập: <b>'+esc(managerPermission?.ten_dang_nhap||managerPermission?.ho_ten||'Tài khoản')+'</b><br>Quyền: <b>'+esc(role)+'</b>';
   $('accountAdminArea').style.display=isAdmin()?'block':'none';
+  if($('accountSessionActions'))$('accountSessionActions').style.display='flex';
   $('loginModal').querySelector('h2').textContent='Trang chủ';
   $('loginRoleChooser').style.display='none';$('loginHouseWrap').style.display='none';
   $('loginModal').querySelector('.notice').style.display='none';
   $('loginModal').querySelector('form').style.display='none';
-  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Đóng</button><button type="button" class="btn blue" onclick="closeModal(\'loginModal\');openModal(\'passwordModal\')">Đổi mật khẩu</button><button type="button" class="btn red" onclick="logout();closeModal(\'loginModal\')">Đăng xuất</button>';
+  $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Đóng</button>';
   openModal('loginModal');
 }
 async function changeOwnPassword(e){
@@ -455,13 +529,14 @@ async function createManagedAccount(e){
     $('createAccountForm').reset();toggleNewAccountScope();await loadManagedAccounts();alert(result.message||('Đã tạo tài khoản '+username+' thành công.'));
   }catch(err){console.error(err);alert('Không tạo được tài khoản.\n\n'+(err.message||err));}
 }
+function accountJsArg(value){return JSON.stringify(String(value??'')).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 async function loadManagedAccounts(){
   const box=$('managedAccountsList');if(!box)return;if(!isAdmin()){box.innerHTML='<p>Chỉ ADMIN được xem danh sách tài khoản.</p>';return;}box.innerHTML='<p>Đang tải danh sách tài khoản…</p>';
   try{
     const result=await accountManagerRequest({action:'list'});let rows=Array.isArray(result.accounts)?result.accounts:Array.isArray(result.data)?result.data:Array.isArray(result.users)?result.users:[];
     if(!rows.length){box.innerHTML='<p>Chưa có tài khoản hoặc máy chủ chưa trả về danh sách. Kiểm tra mục Logs của Edge Function nếu cần.</p>';return;}
     box.innerHTML=rows.map(a=>{const username=a.ten_dang_nhap||a.username||a.ho_ten||a.email||a.user_id;const role=a.vai_tro||a.role||'';const scope=a.pham_vi||'';const active=a.trang_thai===true||a.active===true;const id=a.user_id||a.id;
-      return '<div class="dx-item"><b>'+esc(username)+'</b> <span class="badge">'+esc(role)+'</span> <span class="badge">'+esc(scope||'Toàn quyền')+'</span><br><small>Trạng thái: '+(active?'Đang hoạt động':'Đã khóa')+'</small><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">'+(id?'<button type="button" class="btn blue" onclick="editManagedAccount('+JSON.stringify(String(id))+','+JSON.stringify(String(username))+','+JSON.stringify(String(a.ho_ten||username))+','+JSON.stringify(String(scope||''))+','+JSON.stringify(String(role||''))+')">Sửa thông tin</button><button type="button" class="btn blue" onclick="resetManagedPassword('+JSON.stringify(String(id))+','+JSON.stringify(String(username))+')">Đặt lại mật khẩu</button><button type="button" class="btn '+(active?'red':'green')+'" onclick="toggleManagedAccount('+JSON.stringify(String(id))+','+(!active)+','+JSON.stringify(String(username))+')">'+(active?'Khóa tài khoản':'Mở tài khoản')+'</button>':'')+'</div></div>';
+      return '<div class="dx-item"><b>'+esc(username)+'</b> <span class="badge">'+esc(role)+'</span> <span class="badge">'+esc(scope||'Toàn quyền')+'</span><br><small>Trạng thái: '+(active?'Đang hoạt động':'Đã khóa')+'</small><div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:8px">'+(id?'<button type="button" class="btn blue" onclick="editManagedAccount('+accountJsArg(id)+','+accountJsArg(username)+','+accountJsArg(a.ho_ten||username)+','+accountJsArg(scope||'')+','+accountJsArg(role||'')+')">Sửa thông tin</button><button type="button" class="btn blue" onclick="resetManagedPassword('+accountJsArg(id)+','+accountJsArg(username)+')">Đặt lại mật khẩu</button><button type="button" class="btn '+(active?'red':'green')+'" onclick="toggleManagedAccount('+accountJsArg(id)+','+(!active)+','+accountJsArg(username)+')">'+(active?'Khóa tài khoản':'Mở tài khoản')+'</button>':'')+'</div></div>';
     }).join('');
   }catch(err){console.error(err);box.innerHTML='<div class="notice">Không tải được danh sách: '+esc(err.message||String(err))+'</div>';}
 }
@@ -526,6 +601,7 @@ function updateAuthUI(){
   $('logoutBtn').style.display='none';
   const notice=$('authNotice'); if(notice) notice.style.display='none';
   document.querySelectorAll('.manager-only').forEach(x=>x.style.display=isAdmin()?'inline-block':'none');
+  document.querySelectorAll('.manager-add-only').forEach(x=>x.style.display=m?'inline-block':'none');
   const importInput=$('importFile'); if(importInput) importInput.style.display='none';
 }
 function restoreSession(){try{const s=JSON.parse(localStorage.getItem(SESSION_KEY)||'null');if(s?.access_token)managerSession=s}catch(e){managerSession=null}updateAuthUI();if(managerSession?.refresh_token)refreshSession(false);if(managerSession?.access_token)loadMyPermission().then(()=>{updateAuthUI();render()}).catch(()=>{managerPermission=null;managerSession=null;localStorage.removeItem(SESSION_KEY);updateAuthUI()})}
@@ -566,13 +642,13 @@ function logout(){
   $('loginModal').querySelector('.notice').style.display='block';
   $('loginRoleChooser').style.display='block';toggleLoginHouse();
   $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Hủy</button><button class="btn green">Đăng nhập</button>';
-  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.');
+  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';if($('accountSessionActions'))$('accountSessionActions').style.display='none';updateAuthUI();render();alert('Đã đăng xuất. Bạn đang ở chế độ chỉ xem.');
 }
 function openLogin(){
   $('loginModal').querySelector('h2').textContent='Trang chủ – Chọn tài khoản đăng nhập';
   $('loginModal').querySelector('form').style.display='block';
   $('loginRoleChooser').style.display='block';
-  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';
+  $('accountStatus').style.display='none';$('accountAdminArea').style.display='none';if($('accountSessionActions'))$('accountSessionActions').style.display='none';
   $('loginModal').querySelector('.notice').textContent='Chọn đúng loại tài khoản và nhà được cấp quyền trước khi đăng nhập.';
   $('loginModal').querySelector('.notice').style.display='block';
   $('loginModal').querySelector('.actions').innerHTML='<button type="button" class="btn gray" onclick="closeModal(\'loginModal\')">Hủy</button><button class="btn green">Đăng nhập</button>';
@@ -648,47 +724,99 @@ function allDailyEvents(){
   return people.flatMap(p=>(Array.isArray(p.dienBienHangNgay)?p.dienBienHangNgay:[]).map(e=>({...e,personId:String(e.personId||p.id),ma:e.ma||p.ma||'',ten:e.ten||p.ten||''})))
     .sort((a,b)=>String(b.dateTime||'').localeCompare(String(a.dateTime||'')));
 }
+
+// Chỉ để một mục nội dung chính mở tại một thời điểm trong toàn phần mềm.
+function closeOtherMainSections(keepId=''){
+  ['dutyPanel','censusPanel','dashboardList','dailyReportPanel'].forEach(id=>{
+    if(id===keepId)return;
+    const el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
+}
+
 function openDailyReport(){
-  hideCensusPanel();hideDashboardList();
+  closeOtherMainSections('dailyReportPanel');
   if(!$('dailyReportDate').value)$('dailyReportDate').value=localDateKey();
   $('dailyReportPanel').style.display='block';renderDailyReport();
   $('dailyReportPanel').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function closeDailyReport(){$('dailyReportPanel').style.display='none';}
-let dailyReportFilter='all';
+let dailyReportFilter='';
 function selectDailyReportDetail(filter){dailyReportFilter=filter;renderDailyReport();const el=$('dailyDetailSection');if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});}
 function renderDailyReport(){
   const date=$('dailyReportDate')?.value||localDateKey();
   const events=allDailyEvents().filter(e=>(e.date||localDateKey(e.dateTime))===date);
   const transfers=events.filter(e=>e.type==='transfer').length;
+  const increaseEvents=events.filter(e=>e.type==='increase'||/tăng quân số|tiếp nhận|hồ sơ mới/i.test((e.title||'')+' '+(e.reason||'')));
   const active=people.filter(isCurrentlyManaged);
+  const getZoneForHouse=n=>{const x=Number(String(n||'').replace(/\D/g,''));if(x>=1&&x<=4)return 'I';if(x>=5&&x<=9)return 'II';if(x>=10&&x<=11)return 'III';return '';};
+  const hospitalPeople=active.filter(p=>currentLocation(p)==='Bệnh viện');
+  const present=active.filter(p=>currentLocation(p)!=='Bệnh viện');
+  const inKhu=present.filter(p=>currentLocation(p)==='Khu');
+  const khu1People=inKhu.filter(p=>getZoneForHouse(p.nha)==='I');
+  const khu2People=inKhu.filter(p=>getZoneForHouse(p.nha)==='II');
+  const khu3People=inKhu.filter(p=>getZoneForHouse(p.nha)==='III');
+  const healthPeople=present.filter(p=>currentLocation(p)==='Phòng Y tế'||String(p.nha||'')==='Y tế');
   const currentYear=new Date().getFullYear();
   const over60=active.filter(p=>p.namsinh&&currentYear-Number(p.namsinh)>60).length;
   const under60=active.filter(p=>p.namsinh&&currentYear-Number(p.namsinh)<60).length;
   const male=active.filter(p=>p.gioitinh==='Nam').length;
   const female=active.filter(p=>p.gioitinh==='Nữ').length;
   const disabled=active.filter(p=>p.khuyettat==='Có').length;
-  const statusEvents=events.filter(e=>/hồi gia|tử vong|chuyển đi/i.test((e.title||'')+' '+(e.to||'')));
+  const statusEvents=events.filter(e=>e.type==='decrease'||/hồi gia|tử vong|chuyển đi/i.test((e.title||'')+' '+(e.to||'')));
   const fmt=v=>{if(!v)return '—';const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString('vi-VN',{dateStyle:'short',timeStyle:'short'});};
+  // Bảng quân số theo mẫu người dùng cung cấp; thống kê hồ sơ hiện có.
+  const allPeople=people.slice();
+  const presentForCensus=present;
+  const ageOver60=p=>!!p.namsinh&&(currentYear-Number(p.namsinh)>60);
+  const genderCount=(list,g)=>list.filter(p=>p.gioitinh===g).length;
+  const row=(label,list,totalOverride=null)=>({label,list,total:totalOverride===null?list.length:totalOverride,male:genderCount(list,'Nam'),female:genderCount(list,'Nữ'),over60:list.filter(ageOver60).length});
+  const byLoc=(loc)=>allPeople.filter(p=>currentLocation(p)===loc || (loc==='Khu'&&String(p.vitri||'')==='Khu'));
+  const zoneForHouse=n=>{const x=Number(String(n||'').replace(/\\D/g,''));if(x>=1&&x<=4)return 'I';if(x>=5&&x<=9)return 'II';if(x>=10&&x<=11)return 'III';return '';};
+  const zoneList=z=>allPeople.filter(p=>String(p.nha||'').startsWith('Nhà ')&&getZoneForHouse(p.nha)===z&&currentLocation(p)!=='Phòng Y tế'&&currentLocation(p)!=='Bệnh viện');
+  const tableRows=[
+    row('Tổng số',active),
+    row('Hiện diện',presentForCensus),
+    row('Khu I',khu1People),
+    row('Khu II',khu2People),
+    row('Khu III',khu3People),
+    row('Y tế',healthPeople),
+    row('Bệnh viện',hospitalPeople),
+    row('Người cao tuổi',active.filter(ageOver60)),
+    row('Khuyết tật',active.filter(p=>p.khuyettat==='Có'))
+  ];
+  const censusTable=`<div class="census-report-wrap"><table class="census-report"><thead><tr><th rowspan="2">STT</th><th rowspan="2">NỘI DUNG</th><th rowspan="2">TỔNG SỐ</th><th colspan="2">GIỚI TÍNH</th><th rowspan="2">Trên 60</th><th rowspan="2">GHI CHÚ</th></tr><tr><th>NAM</th><th>NỮ</th></tr></thead><tbody>${tableRows.map((r,i)=>`<tr><td>${i+1}</td><td>${esc(r.label)}</td><td>${r.total}</td><td>${r.male||''}</td><td>${r.female||''}</td><td>${r.over60||''}</td><td></td></tr>`).join('')}</tbody></table></div>`;
   const stat=(label,n,filter)=>`<button type="button" class="daily-report-stat" onclick="selectDailyReportDetail('${filter}')" title="Nhấp để xem danh sách chi tiết"><span>${label}</span><b>${n}</b><small style="display:block;margin-top:4px;color:#347f99">Nhấp để xem chi tiết</small></button>`;
   const cards=`<div class="daily-report-stats">
-    ${stat('Quân số đang quản lý hiện tại',active.length,'active')}
-    ${stat('Diễn biến ghi nhận trong ngày',events.length,'all')}
+    ${stat('Tổng số',active.length,'active')}
+    ${stat('Hiện diện',present.length,'present')}
+    ${stat('Khu I',khu1People.length,'khu1')}
+    ${stat('Khu II',khu2People.length,'khu2')}
+    ${stat('Khu III',khu3People.length,'khu3')}
+    ${stat('Y tế',healthPeople.length,'health')}
+    ${stat('Bệnh viện',hospitalPeople.length,'hospital')}
     ${stat('Trên 60 tuổi',over60,'over60')}
     ${stat('Dưới 60 tuổi',under60,'under60')}
     ${stat('Nam',male,'male')}
     ${stat('Nữ',female,'female')}
     ${stat('Khuyết tật',disabled,'disabled')}
-    ${stat('Lượt chuyển vị trí',transfers,'transfer')}
-    ${stat('Hồi gia / tử vong / chuyển đi',statusEvents.length,'status')}
+    ${stat('Diễn biến ghi nhận trong ngày',events.length,'all')}
   </div>`;
   let detail='';
-  if(dailyReportFilter==='active'){
-    const roster=active.slice().sort((a,b)=>String(a.ten||'').localeCompare(String(b.ten||''),'vi'));
+  if(['active','present','khu1','khu2','khu3','health','hospital'].includes(dailyReportFilter)){
+    let baseRoster=active;
+    if(dailyReportFilter==='present')baseRoster=present;
+    else if(dailyReportFilter==='khu1')baseRoster=khu1People;
+    else if(dailyReportFilter==='khu2')baseRoster=khu2People;
+    else if(dailyReportFilter==='khu3')baseRoster=khu3People;
+    else if(dailyReportFilter==='health')baseRoster=healthPeople;
+    else if(dailyReportFilter==='hospital')baseRoster=hospitalPeople;
+    const roster=baseRoster.slice().sort((a,b)=>String(a.ten||'').localeCompare(String(b.ten||''),'vi'));
     detail=roster.length?roster.map(p=>`<article class="daily-event"><div class="movement">${esc(p.ten||'Chưa có họ tên')} — Mã ĐT: ${esc(p.ma||'Chưa có mã')}</div><div><b>Năm sinh:</b> ${esc(p.namsinh||'—')} · <b>Giới tính:</b> ${esc(p.gioitinh||'—')} · <b>Khuyết tật:</b> ${esc(p.khuyettat||'Không rõ')}</div><div><b>Vị trí:</b> ${esc(locationText(p)||'Chưa xác định')} · <b>Nhà:</b> ${esc(p.nha||'—')}</div><div><b>Địa chỉ:</b> ${esc(p.diachi||'—')}</div><button class="btn blue" style="margin-top:7px" onclick="viewPerson('${String(p.id).replace(/'/g,"\'")}')">Xem hồ sơ đầy đủ</button></article>`).join(''):'<div class="notice">Không có hồ sơ đang quản lý.</div>';
   }else{
     let list=events;
     if(dailyReportFilter==='transfer')list=events.filter(e=>e.type==='transfer');
+    else if(dailyReportFilter==='increase')list=increaseEvents;
     else if(['over60','under60','male','female','disabled'].includes(dailyReportFilter)){
       const filters={over60:p=>p.namsinh&&currentYear-Number(p.namsinh)>60,under60:p=>p.namsinh&&currentYear-Number(p.namsinh)<60,male:p=>p.gioitinh==='Nam',female:p=>p.gioitinh==='Nữ',disabled:p=>p.khuyettat==='Có'};
       const roster=active.filter(filters[dailyReportFilter]).slice().sort((a,b)=>String(a.ten||'').localeCompare(String(b.ten||''),'vi'));
@@ -709,18 +837,80 @@ function renderDailyReport(){
       </article>`;
     }).join(''):'<div class="notice">Chưa có dữ liệu thuộc mục này trong ngày đã chọn. Lịch sử chỉ hiển thị các diễn biến đã được ghi nhận trên hệ thống.</div>';
   }
-  const labels={all:'Tất cả diễn biến trong ngày',active:'Danh sách đầy đủ đối tượng đang quản lý',over60:'Danh sách đối tượng trên 60 tuổi',under60:'Danh sách đối tượng dưới 60 tuổi',male:'Danh sách đối tượng nam',female:'Danh sách đối tượng nữ',disabled:'Danh sách đối tượng khuyết tật',transfer:'Danh sách chuyển vị trí',status:'Danh sách hồi gia / tử vong / chuyển đi'};
-  $('dailyReportContent').innerHTML=`<h3 style="margin:8px 0">BÁO CÁO NGÀY ${esc(date.split('-').reverse().join('/'))}</h3>${cards}<div id="dailyDetailSection" class="section">${labels[dailyReportFilter]||labels.all} (${dailyReportFilter==='active'?active.length:(dailyReportFilter==='all'?events.length:detail?((detail.match(/class="daily-event/g)||[]).length):0)} mục)</div>${detail}`;
+  const labels={all:'Diễn biến ghi nhận trong ngày',active:'Danh sách đầy đủ đối tượng đang quản lý',present:'Danh sách đối tượng hiện diện',khu1:'Danh sách Khu I',khu2:'Danh sách Khu II',khu3:'Danh sách Khu III',health:'Danh sách Y tế',hospital:'Danh sách Bệnh viện',over60:'Danh sách đối tượng trên 60 tuổi',under60:'Danh sách đối tượng dưới 60 tuổi',male:'Danh sách đối tượng nam',female:'Danh sách đối tượng nữ',disabled:'Danh sách đối tượng khuyết tật',increase:'Danh sách tăng mới / tiếp nhận đối tượng',transfer:'Danh sách chuyển vị trí',status:'Danh sách hồi gia / tử vong / chuyển đi'};
+  const showDetail=!!dailyReportFilter;
+  const detailCount=dailyReportFilter==='active'?active.length:dailyReportFilter==='present'?present.length:dailyReportFilter==='khu1'?khu1People.length:dailyReportFilter==='khu2'?khu2People.length:dailyReportFilter==='khu3'?khu3People.length:dailyReportFilter==='health'?healthPeople.length:dailyReportFilter==='hospital'?hospitalPeople.length:dailyReportFilter==='all'?events.length:detail?((detail.match(/class=\"daily-event/g)||[]).length):0;
+  const signature=showDetail&&dailyReportFilter==='all'?`<div class="report-signature-input"><label for="reportPreparedBy">Người lập bảng</label><input id="reportPreparedBy" type="text" maxlength="120" placeholder="Nhập họ tên người lập bảng để in/xuất file"></div>`:'';
+  $('dailyReportContent').innerHTML=`<h3 style="margin:8px 0">QUÂN SỐ ĐỐI TƯỢNG ngày ${esc(date.split('-').reverse().join('/'))}</h3>${censusTable}${cards}${showDetail?`<div id="dailyDetailSection" class="section">${labels[dailyReportFilter]||labels.all} (${detailCount} mục)</div>${detail}${signature}`:''}`;
 }
+function downloadFormattedExcel(filename,rows){
+  // Xuất HTML tương thích Excel với tiêu đề gộp, cột có độ rộng hợp lý và không ép ngày vào cột quá hẹp.
+  const safe=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\r?\n/g,'<br>');
+  const colCount=Math.max(1,...rows.map(r=>r.length));
+  const widths=Array.from({length:colCount},(_,i)=>{
+    const max=rows.reduce((m,r)=>Math.max(m,String(r[i]??'').length),0);
+    return Math.max(14,Math.min(42,max+3));
+  });
+  const tableRows=rows.map((r,ri)=>{
+    const vals=Array.from({length:colCount},(_,i)=>r[i]??'');
+    const nonempty=vals.filter(v=>String(v??'').trim()!=='');
+    if(!nonempty.length)return '<tr><td colspan="'+colCount+'" style="height:8px;border:0"></td></tr>';
+    const firstText=String(vals[0]??'').toUpperCase();
+    const isTitle=ri===0 && /BÁO CÁO|LỊCH TÁI KHÁM/i.test(String(vals[0]??''));
+    const isSingleTitle=nonempty.length===1 && String(vals[0]??'').trim()!=='' && (isTitle || /DANH SÁCH DIỄN BIẾN TRONG NGÀY|CHỈ TIÊU THỐNG KÊ/i.test(firstText));
+    const isHeading=firstText==='STT' || firstText==='NGÀY TÁI KHÁM' || firstText==='CHỈ TIÊU THỐNG KÊ' || firstText==='DANH SÁCH DIỄN BIẾN TRONG NGÀY';
+    if(isSingleTitle){
+      const style='border:1px solid #7f8c8d;padding:10px 8px;background:#1f4e78;color:#fff;font-family:Arial,sans-serif;font-size:15pt;font-weight:bold;text-align:center;vertical-align:middle;white-space:normal;mso-wrap-text:yes';
+      return '<tr><td colspan="'+colCount+'" style="'+style+'">'+safe(vals[0])+'</td></tr>';
+    }
+    return '<tr>'+vals.map((v,ci)=>{
+      const align=(ri>0 && (ci===0 || /^\d+$/.test(String(v).trim())))?'center':'left';
+      const style=[
+        'border:1px solid #7f8c8d','padding:7px 8px','vertical-align:top','white-space:normal','overflow-wrap:break-word','word-wrap:break-word',
+        'mso-number-format:\\@','text-align:'+align,
+        isHeading?'background:#dce6f1;font-weight:bold;text-align:center;vertical-align:middle':''
+      ].filter(Boolean).join(';');
+      return '<td style="'+style+'">'+safe(v)+'</td>';
+    }).join('')+'</tr>';
+  }).join('');
+  const cols=widths.map(w=>'<col style="width:'+Math.round(w*7)+'px;mso-width-source:userset">').join('');
+  const html='\ufeff<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Bao cao</x:Name><x:WorksheetOptions><x:DisplayGridlines>False</x:DisplayGridlines><x:PageSetup><x:Layout x:Orientation="Landscape"/></x:PageSetup><x:Print><x:ValidPrinterInfo/><x:PaperSizeIndex>9</x:PaperSizeIndex><x:HorizontalResolution>600</x:HorizontalResolution><x:VerticalResolution>600</x:VerticalResolution></x:Print></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></xml><![endif]--><style>body{font-family:Arial,sans-serif;color:#222}table{border-collapse:collapse;table-layout:auto;width:auto}td{font-family:Arial,sans-serif;font-size:11pt;mso-wrap-text:yes} @page{size:landscape;margin:0.5in}</style></head><body><table><colgroup>'+cols+'</colgroup><tbody>'+tableRows+'</tbody></table></body></html>';
+  const blob=new Blob([html],{type:'application/vnd.ms-excel;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename.replace(/\.(csv|xls)$/i,'')+'.xls';a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function downloadCsvFile(filename,rows){ return downloadFormattedExcel(filename,rows); }
+function exportDailyReportFile(){
+  renderDailyReport();
+  const date=$('dailyReportDate')?.value||localDateKey();
+  const events=allDailyEvents().filter(e=>(e.date||localDateKey(e.dateTime))===date);
+  const rows=[['BÁO CÁO DIỄN BIẾN HẰNG NGÀY'],['Ngày báo cáo',formatDateVN(date)],[],['STT','Nội dung','Tổng số','Nam','Nữ','Trên 60','Ghi chú']];
+  const table=$('dailyReportContent')?.querySelector('.census-report tbody');
+  if(table){[...table.rows].forEach(tr=>rows.push([...tr.cells].map(td=>td.innerText.trim())));}
+  rows.push([],['DANH SÁCH DIỄN BIẾN TRONG NGÀY'],['Thời gian','Họ và tên','Mã đối tượng','Diễn biến','Từ','Đến / trạng thái','Lý do / ghi chú','Người ghi nhận']);
+  events.forEach(e=>rows.push([e.dateTime||'',e.ten||'',e.ma||'',e.title||'',e.from||'',e.to||'',e.reason||'',e.by||'']));
+  if(!events.length)rows.push(['','','','Không có diễn biến được ghi nhận trong ngày đã chọn']);
+  downloadCsvFile('Bao_cao_dien_bien_'+date+'.csv',rows);
+}
+
+function writeReportWindow(win, html){
+  if(!win) return;
+  const toolbar = `<div id="reportToolbar" style="position:sticky;top:0;z-index:99999;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:#1f2937;color:#fff;padding:10px 14px;margin:-1px -1px 14px;font:14px Arial,sans-serif"><div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" onclick="window.print()" style="display:inline-block!important;background:#16a34a;color:#fff;border:0;border-radius:6px;padding:9px 14px;cursor:pointer;font-weight:bold">🖨 In file</button><button type="button" onclick="window.close()" style="display:inline-block!important;background:#dc2626;color:#fff;border:0;border-radius:6px;padding:9px 14px;cursor:pointer;font-weight:bold">✕ Đóng file</button></div></div>`;
+  let output = String(html);
+  output = output.replace(/<head([^>]*)>/i, '<head$1><style>@media print{#reportToolbar{display:none!important}}@media screen{#reportToolbar{display:flex!important}}#reportToolbar button{display:inline-block!important}</style>');
+  output = output.replace(/<body([^>]*)>/i, `<body$1>${toolbar}`);
+  win.document.open(); win.document.write(output); win.document.close();
+}
+
 function printDailyReport(){
   renderDailyReport();
   const date=$('dailyReportDate')?.value||localDateKey();
   const content=$('dailyReportContent')?.innerHTML||'';
+  const preparedBy=($('reportPreparedBy')?.value||'').trim();
+  const printableContent=content.replace(/<input id=\"reportPreparedBy\"[^>]*>/,preparedBy?`<div style=\"min-width:220px;text-align:right;border-bottom:1px solid #333;padding:6px 0 3px\">${esc(preparedBy)}</div>`:'<div style=\"min-width:220px;border-bottom:1px solid #333;height:28px\"></div>');
   const win=window.open('','_blank');
   if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Cho phép cửa sổ bật lên rồi thử lại.');return;}
-  win.document.open();
-  win.document.write(`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo diễn biến ${date}</title><style>body{font-family:Arial,sans-serif;color:#243447;margin:22px}h2,h3{text-align:center} .daily-report-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.daily-report-stat{border:1px solid #cbd5e1;padding:9px;text-align:center}.daily-report-stat b{display:block;font-size:20px}.daily-event{border:1px solid #cbd5e1;border-left:4px solid #347f99;padding:10px;margin:8px 0;break-inside:avoid}.meta{font-size:11px;color:#475569;margin-top:5px}button{display:none}.section{font-weight:bold;border-bottom:1px solid #ddd;margin-top:18px}@media print{body{margin:12mm}}</style></head><body><h2>TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</h2><h3>BÁO CÁO DIỄN BIẾN HẰNG NGÀY — ${date.split('-').reverse().join('/')}</h3>${content}<p style="text-align:right;margin-top:35px">Người lập báo cáo: ................................</p><script>window.onload=()=>setTimeout(()=>window.print(),250);<\\/script></body></html>`);
-  win.document.close();
+  const reportHtml = `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo diễn biến ${date}</title><style>body{font-family:Arial,sans-serif;color:#243447;margin:22px}h2,h3{text-align:center} .daily-report-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.daily-report-stat{border:1px solid #cbd5e1;padding:9px;text-align:center}.daily-report-stat b{display:block;font-size:20px}.daily-event{border:1px solid #cbd5e1;border-left:4px solid #347f99;padding:10px;margin:8px 0;break-inside:avoid}.meta{font-size:11px;color:#475569;margin-top:5px}button{display:none}.section{font-weight:bold;border-bottom:1px solid #ddd;margin-top:18px}.census-report-wrap{overflow:visible}.census-report{width:100%;min-width:0;border-collapse:collapse;font-family:"Times New Roman",serif}.census-report th,.census-report td{border:1px solid #222;padding:7px 5px;text-align:center;color:#111;font-size:12pt;font-family:"Times New Roman",serif}.census-report th{background:#fff;color:#111;position:static}.census-report td:nth-child(2){text-align:left;font-weight:bold}.census-report td:nth-child(3){font-weight:bold}@page{size:A4 landscape;margin:0}@media print{body{margin:10mm}}</style></head><body><h2>TRUNG TÂM BẢO TRỢ XÃ HỘI TÂN HIỆP</h2><h3>BÁO CÁO DIỄN BIẾN HẰNG NGÀY — ${date.split('-').reverse().join('/')}</h3>${printableContent}<script>window.onload=()=>setTimeout(()=>window.print(),250);<\\/script></body></html>`;
+  writeReportWindow(win,reportHtml);
 }
 
 async function savePerson(e){
@@ -743,7 +933,9 @@ async function savePerson(e){
       if(newStatus==='Đang quản lý'){
         appendDailyEvent(p,makeDailyEvent({type:'increase',title:'Tăng quân số — tiếp nhận trở lại',p,from:oldStatus,to:newPlace,reason:'Đối tượng được chuyển về trạng thái đang quản lý',dateTime:eventNow}));
       }else if(['Hồi gia','Tử vong','Chuyển đi nơi khác'].includes(newStatus)){
-        appendDailyEvent(p,makeDailyEvent({type:'decrease',title:'Giảm quân số — '+newStatus,p,from:oldPlace,to:newStatus,reason:$('statusDate').value?('Ngày ghi nhận: '+$('statusDate').value):'Cập nhật trạng thái hồ sơ',dateTime:eventNow}));
+        const selectedStatusDate=$('statusDate').value;
+        const statusEventTime=selectedStatusDate?new Date(selectedStatusDate+'T12:00:00').toISOString():eventNow;
+        appendDailyEvent(p,makeDailyEvent({type:'decrease',title:'Giảm quân số — '+newStatus,p,from:oldPlace,to:newStatus,reason:selectedStatusDate?('Ngày ghi nhận: '+selectedStatusDate):'Cập nhật trạng thái hồ sơ',dateTime:statusEventTime}));
       }else{
         appendDailyEvent(p,makeDailyEvent({type:'status',title:'Thay đổi trạng thái hồ sơ',p,from:oldStatus,to:newStatus,dateTime:eventNow}));
       }
@@ -1003,7 +1195,7 @@ function censusAge(p){return p.namsinh?new Date().getFullYear()-Number(p.namsinh
 function censusZoneForHouse(h){const n=Number(String(h||'').replace(/[^0-9]/g,''));if(n>=1&&n<=4)return 'elderly';if(n>=5&&n<=9)return 'homeless';if(n>=10&&n<=11)return 'mental';return '';}
 function censusZoneName(z){return ({elderly:'Khu Chăm sóc nuôi dưỡng Người cao tuổi',homeless:'Khu Chăm sóc nuôi dưỡng Người lang thang',mental:'Khu Chăm sóc nuôi dưỡng Người bệnh tâm thần',medical:'Khu Y tế'})[z]||'Các khu';}
 function censusListForZone(z){const a=people.filter(isCurrentlyManaged);if(z==='medical')return a.filter(p=>currentLocation(p)==='Phòng Y tế');return a.filter(p=>currentLocation(p)==='Khu'&&censusZoneForHouse(p.nha)===z);}
-function showKhuPanel(){hideDashboardList();const panel=$('censusPanel');panel.style.display='block';renderCensusHome();panel.scrollIntoView({behavior:'smooth',block:'start'});}
+function showKhuPanel(){closeOtherMainSections('censusPanel');const panel=$('censusPanel');panel.style.display='block';renderCensusHome();panel.scrollIntoView({behavior:'smooth',block:'start'});}
 function hideCensusPanel(){$('censusPanel').style.display='none';}
 function renderCensusHome(){
  const zones=[['elderly',''],['homeless',''],['mental','']];
@@ -1030,10 +1222,10 @@ function openCensusZone(z){
  censusZoneFilter='all';const pop=$('censusContent');const zoneName=censusZoneName(z);let houses=[];
  if(z==='elderly')houses=[1,2,3,4];else if(z==='homeless')houses=[5,6,7,8,9];else if(z==='mental')houses=[10,11];
  if(z==='medical'){
-  const list=censusListForZone('medical');pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName} — ${list.length} đối tượng</h3>${censusStatsHtml(list)}${censusPeopleHtml(list)}`;return;
+  const list=censusListForZone('medical');pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName} — ${list.length} đối tượng</h3><div class="duty-house-inline"><b>👥 Cán bộ Y tế hôm nay</b>${dutyHouseLabelHtml('Y tế')}</div>${censusStatsHtml(list)}${censusPeopleHtml(list)}`;return;
  }
  const all=censusListForZone(z);
- pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName}</h3><div class="census-house-list">${houses.map(n=>{const list=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()==='Nhà '+n);return `<button class="census-zone" onclick="openCensusHouse(${n})"><b>Nhà ${n}</b><span>${list.length} đối tượng</span></button>`}).join('')}</div>
+ pop.innerHTML=`<button class="btn gray" onclick="renderCensusHome()">← Quay lại</button><h3>${zoneName}</h3><div class="census-house-list">${houses.map(n=>{const list=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()==='Nhà '+n);return `<button class="census-zone" onclick="openCensusHouse(${n})"><b>Nhà ${n}</b><span>${list.length} đối tượng</span>${dutyHouseLabelHtml('Nhà '+n)}</button>`}).join('')}</div>
  <div class="section">Danh sách đối tượng theo tiêu chí</div>${censusStatsHtml(all,null,z)}
  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0"><button class="btn green" onclick="exportSchedule('zone','${z}','csv')">Xuất lịch tái khám Excel (CSV)</button><button class="btn blue" onclick="exportSchedule('zone','${z}','pdf')">Xuất lịch tái khám PDF / In</button></div>
  <div id="zoneFilteredPeople">${censusPeopleHtml(all)}</div>`;
@@ -1060,7 +1252,7 @@ function renderCensusHouse(n, query=''){
  let list=q?all.filter(p=>String(p.ten||'').toLocaleLowerCase('vi').includes(q)||String(p.ma||'').toLocaleLowerCase('vi').includes(q)):all;
  const filters={male:p=>p.gioitinh==='Nam',female:p=>p.gioitinh==='Nữ',over60:p=>censusAge(p)>60,under60:p=>censusAge(p)!==null&&censusAge(p)<60,disabled:p=>p.khuyettat==='Có',med:p=>isTakingMedicine(p),ha:p=>p.thuocHA,mental:p=>p.thuocTT,other:p=>p.thuocKhac,review:p=>!!p.ngayTaiKham};if(censusHouseFilter!=='all'&&filters[censusHouseFilter])list=list.filter(filters[censusHouseFilter]);
  const z=censusZoneForHouse(house);
- $('censusContent').innerHTML=`<button class="btn gray" onclick="openCensusZone('${z}')">← Quay lại ${censusZoneName(z)}</button><h3>${house} — ${all.length} đối tượng</h3><input type="search" class="house-search" placeholder="Tìm theo tên hoặc mã đối tượng..." value="${esc(query)}" oninput="renderCensusHouse(${n},this.value)" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0 12px"><button type="button" class="btn purple" onclick="toggleCensusHouseDx(${n})">＋ Khám đột xuất</button><button type="button" class="btn green" style="margin-left:6px" onclick="showHouseReviewPanel(${n})">📅 Lịch tái khám</button><div id="houseReviewPanel"></div>${censusDxSearchOpen?`<div style="margin:10px 0;padding:12px;border:1px solid #d8dee8;border-radius:8px"><label for="houseDxSearch">Tìm đối tượng để khám đột xuất</label><input id="houseDxSearch" type="search" placeholder="Nhập tên hoặc mã đối tượng..." oninput="renderCensusHouseDxSearch(${n},this.value)" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0"><div id="houseDxSearchResults"><div class="notice">Nhập tên hoặc mã đối tượng để chọn người cần khám đột xuất.</div></div></div>`:''}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0"><label for="censusReportPeriod">Báo cáo:</label><select id="censusReportPeriod" style="padding:9px;border:1px solid #cbd5e1;border-radius:8px"><option value="week">Theo tuần</option><option value="month">Theo tháng</option><option value="6months">6 tháng</option><option value="year">1 năm</option></select><button class="btn blue" onclick="exportCensusHouseReport(${n})">Xuất báo cáo PDF</button><button class="btn green" onclick="exportSchedule('house',${n},'csv')">Xuất lịch tái khám Excel (CSV)</button><button class="btn blue" onclick="exportSchedule('house',${n},'pdf')">Xuất lịch tái khám PDF / In</button></div>${censusStatsHtml(list,n)}${censusPeopleHtml(list)}`;
+ $('censusContent').innerHTML=`<button class="btn gray" onclick="openCensusZone('${z}')">← Quay lại ${censusZoneName(z)}</button><h3>${house} — ${all.length} đối tượng</h3><div class="duty-house-inline"><b>👥 Cán bộ quản lý nhà hôm nay</b>${dutyHouseLabelHtml(house)}</div><input type="search" class="house-search" placeholder="Tìm theo tên hoặc mã đối tượng..." value="${esc(query)}" oninput="renderCensusHouse(${n},this.value)" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0 12px"><button type="button" class="btn purple" onclick="toggleCensusHouseDx(${n})">＋ Khám đột xuất</button><button type="button" class="btn green" style="margin-left:6px" onclick="showHouseReviewPanel(${n})">📅 Lịch tái khám</button><div id="houseReviewPanel"></div>${censusDxSearchOpen?`<div style="margin:10px 0;padding:12px;border:1px solid #d8dee8;border-radius:8px"><label for="houseDxSearch">Tìm đối tượng để khám đột xuất</label><input id="houseDxSearch" type="search" placeholder="Nhập tên hoặc mã đối tượng..." oninput="renderCensusHouseDxSearch(${n},this.value)" style="width:100%;box-sizing:border-box;padding:12px;border:1px solid #cbd5e1;border-radius:8px;margin:8px 0"><div id="houseDxSearchResults"><div class="notice">Nhập tên hoặc mã đối tượng để chọn người cần khám đột xuất.</div></div></div>`:''}<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0"><label for="censusReportPeriod">Báo cáo:</label><select id="censusReportPeriod" style="padding:9px;border:1px solid #cbd5e1;border-radius:8px"><option value="week">Theo tuần</option><option value="month">Theo tháng</option><option value="6months">6 tháng</option><option value="year">1 năm</option></select><button class="btn blue" onclick="exportCensusHouseReport(${n})">Xuất báo cáo PDF</button><button class="btn purple" onclick="exportCensusHouseCsv(${n})">Xuất file Excel (CSV)</button><button class="btn green" onclick="exportSchedule('house',${n},'csv')">Xuất lịch tái khám Excel (CSV)</button><button class="btn blue" onclick="exportSchedule('house',${n},'pdf')">Xuất lịch tái khám PDF / In</button></div>${censusStatsHtml(list,n)}${censusPeopleHtml(list)}`;
  const input=$('censusContent').querySelector('.house-search');if(input){input.focus();input.setSelectionRange(query.length,query.length);}
 }
 
@@ -1144,14 +1336,27 @@ function exportSchedule(scope,id,format){
    return history.map(item=>({ngay:item.date||'',ten:p.ten||'',ma:p.ma||'',nha:p.nha||'',vitri:locationText(p),thuoc:meds(p),tinhTrang:p.tinhTrang||'',ghiChu:item.note||''}));
  }).filter(r=>r.ngay).sort((a,b)=>String(a.ngay).localeCompare(String(b.ngay)));
  if(format==='csv'){
-  const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
-  const csv='\ufeff'+[['Ngày tái khám','Họ và tên','Mã đối tượng','Nhà','Vị trí','Thuốc','Tình trạng','Ghi chú'],...rows.map(r=>[r.ngay,r.ten,r.ma,r.nha,r.vitri,r.thuoc,r.tinhTrang,r.ghiChu])].map(r=>r.map(cell).join(',')).join('\r\n');
-  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='Lich_kham_'+label.replace(/[^a-zA-Z0-9À-ỹ]+/g,'_')+'.csv';a.click();URL.revokeObjectURL(a.href);return;
+  const excelRows=[['LỊCH TÁI KHÁM — '+label],['Ngày xuất',new Date().toLocaleDateString('vi-VN')],[],['Ngày tái khám','Họ và tên','Mã đối tượng','Nhà','Vị trí','Thuốc','Tình trạng','Ghi chú'],...rows.map(r=>[formatDateVN(r.ngay),r.ten,r.ma,r.nha,r.vitri,r.thuoc,r.tinhTrang,r.ghiChu])];
+  downloadFormattedExcel('Lich_kham_'+label.replace(/[^a-zA-Z0-9À-ỹ]+/g,'_')+'.xls',excelRows);return;
  }
  const escH=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  const report=`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Lịch khám ${escH(label)}</title><style>body{font-family:Arial,sans-serif;margin:18mm;color:#222}h2{text-align:center}p{text-align:center}table{border-collapse:collapse;width:100%;font-size:12px}th,td{border:1px solid #555;padding:7px;text-align:left}th{background:#e8eef7}@media print{body{margin:12mm}}</style></head><body><h2>LỊCH TÁI KHÁM – ${escH(label)}</h2><p>Ngày xuất: ${new Date().toLocaleDateString('vi-VN')}</p><table><thead><tr><th>STT</th><th>Ngày khám</th><th>Họ và tên</th><th>Mã ĐT</th><th>Nhà</th><th>Thuốc</th><th>Tình trạng</th><th>Ghi chú</th></tr></thead><tbody>${rows.map((r,i)=>`<tr><td>${i+1}</td><td>${escH(formatDateVN(r.ngay))}</td><td>${escH(r.ten)}</td><td>${escH(r.ma)}</td><td>${escH(r.nha)}</td><td>${escH(r.thuoc)}</td><td>${escH(r.tinhTrang)}</td><td>${escH(r.ghiChu)}</td></tr>`).join('')}</tbody></table><p style="margin-top:35px;text-align:right">Người lập: ................................</p><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`;
- const win=window.open('','_blank');if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Hãy cho phép cửa sổ bật lên rồi thử lại.');return;}win.document.open();win.document.write(report);win.document.close();
+ const win=window.open('','_blank');if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Hãy cho phép cửa sổ bật lên rồi thử lại.');return;}writeReportWindow(win,report);
 }
+function exportCensusHouseCsv(n){
+ const house='Nhà '+n;const period=$('censusReportPeriod')?.value||'month';const now=new Date();const start=new Date(now);
+ if(period==='week')start.setDate(start.getDate()-6);else if(period==='month')start.setMonth(start.getMonth()-1);else if(period==='6months')start.setMonth(start.getMonth()-6);else start.setFullYear(start.getFullYear()-1);
+ const periodName=({week:'7 ngày gần nhất',month:'1 tháng gần nhất','6months':'6 tháng gần nhất',year:'1 năm gần nhất'})[period];
+ const rows=people.filter(p=>isCurrentlyManaged(p)&&currentLocation(p)==='Khu'&&String(p.nha||'').trim()===house);
+ const inPeriod=value=>{if(!value)return false;const d=new Date(value);return !Number.isNaN(d.getTime())&&d>=start&&d<=now;};
+ const over60=rows.filter(p=>censusAge(p)>60).length,under60=rows.filter(p=>censusAge(p)!==null&&censusAge(p)<60).length,disabled=rows.filter(p=>p.khuyettat==='Có').length;
+ const medicinePeople=rows.filter(p=>p.thuocHA||p.thuocTT||p.thuocKhac).length;
+ const emergencyVisits=rows.reduce((sum,p)=>sum+(p.khamDotXuat||[]).filter(d=>inPeriod(d.dateTime)).length,0);
+ const examVisits=rows.filter(p=>inPeriod(p.ngayTaiKham)).length;
+ const data=[['BÁO CÁO THỐNG KÊ QUÂN SỐ VÀ Y TẾ',house],['Kỳ báo cáo',periodName],['Ngày lập',now.toLocaleDateString('vi-VN')],[],['Chỉ tiêu thống kê','Số lượng'],['Tổng quân số đang quản lý',rows.length],['Đối tượng trên 60 tuổi',over60],['Đối tượng dưới 60 tuổi',under60],['Đối tượng khuyết tật',disabled],['Đối tượng có ghi nhận sử dụng thuốc',medicinePeople],['Lượt khám đột xuất trong kỳ',emergencyVisits],['Đối tượng có lịch tái khám trong kỳ',examVisits]];
+ downloadCsvFile('Bao_cao_'+house.replace(/ /g,'_')+'_'+period+'.csv',data);
+}
+
 function exportCensusHouseReport(n){
  const house='Nhà '+n;const period=$('censusReportPeriod')?.value||'month';const now=new Date();const start=new Date(now);
  if(period==='week')start.setDate(start.getDate()-6);else if(period==='month')start.setMonth(start.getMonth()-1);else if(period==='6months')start.setMonth(start.getMonth()-6);else start.setFullYear(start.getFullYear()-1);
@@ -1168,12 +1373,12 @@ function exportCensusHouseReport(n){
  const stats=[['Tổng quân số đang quản lý',rows.length],['Đối tượng trên 60 tuổi',over60],['Đối tượng dưới 60 tuổi',under60],['Đối tượng khuyết tật',disabled],['Đối tượng có ghi nhận sử dụng thuốc',medicinePeople],['Lượt khám đột xuất trong kỳ',emergencyVisits],['Đối tượng có lịch tái khám trong kỳ',examVisits]];
  const escPdf=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
  const report=`<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo thống kê ${house}</title><style>body{font-family:Arial,sans-serif;color:#172b4d;margin:28px}h1{text-align:center;font-size:20px;margin-bottom:6px}h2{text-align:center;font-size:16px;margin-top:0}p{text-align:center;font-size:12px;color:#475569}table{width:100%;border-collapse:collapse;margin-top:24px}th,td{border:1px solid #64748b;padding:12px;text-align:left}th{background:#e8eef7}td:last-child{text-align:center;font-weight:bold;width:25%}.foot{margin-top:28px;text-align:right;font-size:12px}@media print{body{margin:15mm}}</style></head><body><h1>BÁO CÁO THỐNG KÊ QUÂN SỐ VÀ Y TẾ</h1><h2>${escPdf(house)}</h2><p>Kỳ báo cáo: ${escPdf(periodName)} · Ngày lập: ${now.toLocaleDateString('vi-VN')}</p><table><thead><tr><th>Chỉ tiêu thống kê</th><th>Số lượng</th></tr></thead><tbody>${stats.map(r=>`<tr><td>${escPdf(r[0])}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table><div class="foot">Người lập báo cáo: ................................</div><script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`;
- const win=window.open('','_blank');if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Vui lòng cho phép cửa sổ bật lên rồi thử lại.');return;}win.document.open();win.document.write(report);win.document.close();
+ const win=window.open('','_blank');if(!win){alert('Trình duyệt đang chặn cửa sổ báo cáo. Vui lòng cho phép cửa sổ bật lên rồi thử lại.');return;}writeReportWindow(win,report);
 }
 function openCensusHouse(n){censusHouseFilter='all';renderCensusHouse(n);}
 function hideDashboardList(){$('dashboardList').style.display='none';}
 function showDashboardList(type){
- hideCensusPanel();
+ closeOtherMainSections('dashboardList');
  let title='',html='';
  if(type==='Khu'){
   title='Danh sách tại Khu — chọn Nhà';
@@ -1198,6 +1403,316 @@ function showDashboardList(type){
 function setLocationFilter(v){$('filterLocation').value=v;render()}
 function exportData(){let blob=new Blob([JSON.stringify(people,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='BTXH_Tan_Hiep_backup.json';a.click();URL.revokeObjectURL(a.href)}
 function importData(e){if(!isManager()){alert('Chỉ Quản lý mới được khôi phục dữ liệu.');e.target.value='';return}let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{let d=JSON.parse(r.result);if(!Array.isArray(d))throw new Error('File sao lưu không hợp lệ.');for(const p of d){if(!p.id)p.id=uid();await api('so_tay_suc_khoe',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:p.id,data:p,updated_at:new Date().toISOString()})})}await loadPeople();alert('Khôi phục dữ liệu thành công.')}catch(err){showCloudError(err)}finally{e.target.value=''}};r.readAsText(f)}
+
+/* Phân công cán bộ quản lý nhà trong ngày — đồng bộ Supabase */
+const DUTY_STORAGE_KEY='btxh_duty_roster_today_v1'; // giữ tên cũ để tương thích các sự kiện giao diện
+const DUTY_TABLE='daily_duty_roster';
+const DUTY_LOCATIONS=[...Array.from({length:11},(_,i)=>'Nhà '+(i+1)),'Y tế'];
+let dutyRosterCache={date:todayLocalKey(),items:{},updatedAt:''};
+let dutyLoadInProgress=null;
+function emptyDutyRoster(){return {date:todayLocalKey(),items:{},updatedAt:''};}
+function readDutyRoster(){
+  if(!dutyRosterCache||dutyRosterCache.date!==todayLocalKey())dutyRosterCache=emptyDutyRoster();
+  return dutyRosterCache;
+}
+async function loadDutyRosterFromCloud(){
+  if(dutyLoadInProgress)return dutyLoadInProgress;
+  dutyLoadInProgress=(async()=>{
+    try{
+      const r=await api(`${DUTY_TABLE}?id=eq.1&select=id,roster_date,items,updated_at`);
+      const raw=await r.text();
+      if(!r.ok)throw new Error(raw||('HTTP '+r.status));
+      const rows=raw?JSON.parse(raw):[];
+      const row=Array.isArray(rows)?rows[0]:null;
+      const today=todayLocalKey();
+      if(row&&row.roster_date===today){
+        dutyRosterCache={date:today,items:row.items&&typeof row.items==='object'?row.items:{},updatedAt:row.updated_at?new Date(row.updated_at).toLocaleString('vi-VN'):' '};
+      }else{
+        dutyRosterCache=emptyDutyRoster();
+        // Dọn bản ghi hết hạn. Chính sách RLS của bảng chỉ cho phép thao tác trên bảng phân công này.
+        if(row&&row.roster_date!==today){
+          const del=await api(`${DUTY_TABLE}?id=eq.1`,{method:'DELETE',headers:headers({'Prefer':'return=minimal'})});
+          if(!del.ok)console.warn('Không dọn được phân công ngày cũ:',await del.text());
+        }
+      }
+      renderDutyPanel();updateDutyHouseLabels();
+    }catch(err){
+      console.error('Không tải được cán bộ quản lý nhà hôm nay từ Supabase:',err);
+      const box=$('dutyResults');
+      if(box)box.innerHTML='<div class="duty-empty">Chưa kết nối được dữ liệu dùng chung. Quản trị viên cần tạo bảng daily_duty_roster và chính sách RLS trong Supabase theo hướng dẫn đi kèm file.</div>';
+    }finally{dutyLoadInProgress=null;}
+  })();
+  return dutyLoadInProgress;
+}
+function toggleDutyPanel(show){
+  if(show)closeOtherMainSections('dutyPanel');
+  const panel=$('dutyPanel');
+  const button=$('openDutyPanelBtn');
+  if(!panel)return;
+  panel.style.display=show?'block':'none';
+  if(button)button.setAttribute('aria-expanded',show?'true':'false');
+  if(show){
+    renderDutyPanel();
+    initHandoverForm();
+    loadDutyRosterFromCloud();
+    loadHandoverHistory();
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+function renderDutyPanel(){
+  const roster=readDutyRoster();
+  const label=$('dutyTodayLabel');if(label)label.textContent='Ngày '+todayLocalKey().split('-').reverse().join('/');
+  const checklist=$('dutyChecklist');if(!checklist)return;
+  checklist.innerHTML=DUTY_LOCATIONS.map((location,i)=>{
+    const item=roster.items[location]||{};const checked=!!item.selected;
+    // Đã phân công thì không cho bỏ chọn; người dùng vẫn được sửa tên cán bộ.
+    return `<div class="duty-choice"><label><input type="checkbox" id="dutyCheck${i}" ${checked?'checked disabled':''} onchange="toggleDutyName(${i})"><span>${esc(location)}</span></label><div id="dutyNameWrap${i}" class="duty-name ${checked?'show':''}"><label for="dutyName${i}" style="font-size:12px;margin-bottom:4px">Tên cán bộ trực</label><input id="dutyName${i}" value="${esc(item.name||'')}" placeholder="Nhập họ tên cán bộ" autocomplete="off"></div></div>`
+  }).join('');
+  renderDutyResults(roster);
+}
+function toggleDutyName(index){const wrap=$('dutyNameWrap'+index),check=$('dutyCheck'+index);if(wrap)wrap.classList.toggle('show',!!check?.checked);}
+function resetDutyForm(){
+  const saved=readDutyRoster().items||{};
+  DUTY_LOCATIONS.forEach((location,i)=>{
+    // Chỉ bỏ các lựa chọn chưa lưu; phân công hiện có và tên đã lưu được giữ nguyên.
+    if(saved[location]?.selected)return;
+    const check=$('dutyCheck'+i),wrap=$('dutyNameWrap'+i),input=$('dutyName'+i);
+    if(check)check.checked=false;if(wrap)wrap.classList.remove('show');if(input)input.value='';
+  });
+}
+async function saveDutyRoster(){
+  const today=todayLocalKey();let items={};let invalid='';
+  try{
+    // Đọc dữ liệu mới nhất từ Supabase trước khi lưu để không ghi đè phân công của thiết bị khác.
+    const existingResponse=await api(`${DUTY_TABLE}?id=eq.1&select=id,roster_date,items,updated_at`);
+    const existingRaw=await existingResponse.text();
+    if(!existingResponse.ok)throw new Error(existingRaw||('HTTP '+existingResponse.status));
+    const existingRows=existingRaw?JSON.parse(existingRaw):[];
+    const existingRow=Array.isArray(existingRows)?existingRows[0]:null;
+    if(existingRow&&existingRow.roster_date===today&&existingRow.items&&typeof existingRow.items==='object')items={...existingRow.items};
+
+    DUTY_LOCATIONS.forEach((location,i)=>{
+      const previous=items[location];
+      const check=$('dutyCheck'+i);
+      const checked=!!check?.checked || !!previous?.selected;
+      const name=($('dutyName'+i)?.value||'').trim();
+      // Không cho xóa phân công cũ; nếu ô tên cũ trống thì giữ tên đã lưu.
+      if(previous?.selected){
+        if(!name){invalid=location;return;}
+        items[location]={...previous,selected:true,name};
+      }else if(checked){
+        if(!name){invalid=location;return;}
+        items[location]={selected:true,name};
+      }
+    });
+    if(invalid){alert('Vui lòng nhập tên cán bộ cho '+invalid+'. Phân công đã lưu không thể bỏ hoặc xóa.');$('dutyName'+DUTY_LOCATIONS.indexOf(invalid))?.focus();return;}
+
+    const payload={id:1,roster_date:today,items,updated_at:new Date().toISOString()};
+    const r=await api(DUTY_TABLE+'?on_conflict=id',{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=representation'}),body:JSON.stringify(payload)});
+    const raw=await r.text();
+    if(!r.ok)throw new Error(raw||('HTTP '+r.status));
+    dutyRosterCache={date:today,items,updatedAt:new Date(payload.updated_at).toLocaleString('vi-VN')};
+    renderDutyPanel();updateDutyHouseLabels();
+    alert('Đã cập nhật phân công cán bộ hôm nay. Tên mới sẽ hiển thị ở nhà tương ứng trên các máy tính và điện thoại. Phân công đã lưu không thể bỏ chọn hoặc xóa; dữ liệu chỉ có hiệu lực trong ngày hiện tại.');
+  }catch(err){
+    console.error('Lưu cán bộ quản lý nhà hôm nay thất bại:',err);
+    alert('Chưa cập nhật được lên hệ thống dùng chung. Hãy kiểm tra kết nối và bảng daily_duty_roster trong Supabase.\n\nChi tiết: '+(err?.message||String(err)));
+  }
+}
+function renderDutyResults(roster=readDutyRoster()){
+  const box=$('dutyResults');if(!box)return;
+  const entries=DUTY_LOCATIONS.filter(location=>roster.items?.[location]?.selected&&roster.items[location].name);
+  if(!entries.length){box.innerHTML='';return;}
+  box.innerHTML='<div class="duty-results">'+entries.map(location=>`<div class="duty-result"><b>${esc(location)}</b><span>👤 ${esc(roster.items[location].name)}</span></div>`).join('')+'</div><small style="display:block;color:#64748b;margin-top:8px">'+(roster.updatedAt?'Cập nhật lần cuối: '+esc(roster.updatedAt):'')+'</small>';
+}
+/* Sổ nhận ca/bàn giao ca: nhật ký chỉ thêm mới, không cung cấp chức năng xóa */
+const HANDOVER_TABLE='daily_duty_handover_log';
+const HANDOVER_PENDING='__CHO_NGUOI_NHAN_XAC_NHAN__';
+function initHandoverForm(){
+  const sel=$('handoverLocation');if(sel&&!sel.options.length)sel.innerHTML=DUTY_LOCATIONS.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
+  const date=$('handoverDate');if(date)date.value=todayLocalKey();
+  document.querySelectorAll('input[name="handoverTimeChoice"]').forEach(el=>el.addEventListener('change',()=>{$('handoverCustomTimeWrap').style.display=document.querySelector('input[name="handoverTimeChoice"]:checked')?.value==='custom'?'block':'none';}));
+}
+function toggleHandoverNote(selectId,wrapId){
+  const other=$ (selectId); const wrap=$(wrapId);if(wrap)wrap.style.display=other?.value==='Khác'?'block':'none';
+}
+function selectedHandoverTime(){const v=document.querySelector('input[name="handoverTimeChoice"]:checked')?.value||'11:30';return v==='custom'?($('handoverCustomTime')?.value||''):v;}
+async function saveHandoverRecord(event){
+  event.preventDefault();initHandoverForm();
+  const location=$('handoverLocation').value;
+  const from=$('handoverFrom').value.trim(),to=$('handoverTo').value.trim();
+  const time=selectedHandoverTime();
+  const antt=$('handoverAntt').value,skdt=$('handoverSkdt').value;
+  const anttNote=$('handoverAnttNote').value.trim(),skdtNote=$('handoverSkdtNote').value.trim();
+  if(!from){alert('Vui lòng nhập họ tên cán bộ giao ca.');$('handoverFrom').focus();return;}
+  if(!time){alert('Vui lòng chọn hoặc nhập giờ bàn giao.');return;}
+  if(antt==='Khác'&&!anttNote){alert('Vui lòng ghi nội dung ANTT cần lưu ý.');$('handoverAnttNote').focus();return;}
+  if(skdt==='Khác'&&!skdtNote){alert('Vui lòng ghi nội dung SKĐT cần lưu ý.');$('handoverSkdtNote').focus();return;}
+  const now=new Date();const date=todayLocalKey();
+  const record={roster_date:date,location,scheduled_time:time,actual_time:time,handed_over_by:from,received_by:HANDOVER_PENDING,antt_status:antt,antt_note:antt==='Khác'?anttNote:'',skdt_status:skdt,skdt_note:skdt==='Khác'?skdtNote:'',created_at:now.toISOString()};
+  const submit=$('handoverForm')?.querySelector('button[type="submit"]');if(submit){submit.disabled=true;submit.textContent='Đang lưu…';}
+  try{
+    const r=await api(HANDOVER_TABLE,{method:'POST',headers:headers({'Prefer':'return=representation'}),body:JSON.stringify(record)});
+    const raw=await r.text();if(!r.ok)throw new Error(raw||('HTTP '+r.status));
+    // Sau khi lưu, lọc lịch sử về đúng nhà/khu vực vừa bàn giao để giao diện gọn hơn.
+    handoverHistoryLocationFilter=location;
+    renderHandoverHistoryFilters();
+    // Chỉ tạo lượt bàn giao ở trạng thái chờ; người nhận phải tự xác nhận riêng.
+    await loadHandoverHistory();
+    $('handoverFrom').value='';$('handoverTo').value='';
+    $('handoverAntt').value='Ổn định';$('handoverSkdt').value='Ổn định';
+    $('handoverAnttNote').value='';$('handoverSkdtNote').value='';
+    $('handoverAnttNoteWrap').style.display='none';$('handoverSkdtNoteWrap').style.display='none';
+    alert('Đã lưu thông tin giao ca. Lượt này đang ở trạng thái CHỜ NHẬN CA; người nhận phải tự nhập tên và xác nhận trong lịch sử bàn giao.');
+
+  }catch(err){console.error('Lưu bàn giao ca lỗi:',err);alert('Chưa hoàn tất lưu bàn giao. Chi tiết: '+(err?.message||String(err))+'\n\nNếu bảng lịch sử chưa được tạo, hãy chạy file SQL hướng dẫn đi kèm.');}
+  finally{if(submit){submit.disabled=false;submit.textContent='💾 Lưu bàn giao ca';}}
+}
+function showTodayHandoverHistory(){
+  const date=todayLocalKey();const picker=$('adminHandoverHistoryDate');if(picker)picker.value=date;
+  loadHandoverHistory(date);
+}
+let handoverHistoryLocationFilter='';
+function renderHandoverHistoryFilters(){
+  const host=$('handoverLocationFilterButtons');if(!host)return;
+  const options=[...(isAdmin()?[{value:'',label:'Tất cả'}]:[]),...DUTY_LOCATIONS.map(location=>({value:location,label:location}))];
+  if(!isAdmin() && !handoverHistoryLocationFilter){ handoverHistoryLocationFilter=getAssignedHouse() || (isMedicalAccount()?'Y tế':(DUTY_LOCATIONS[0]||'')); }
+  host.innerHTML=options.map(opt=>`<button type="button" class="btn ${handoverHistoryLocationFilter===opt.value?'blue':'gray'}" style="padding:6px 10px;min-width:64px" aria-pressed="${handoverHistoryLocationFilter===opt.value?'true':'false'}" onclick="setHandoverHistoryLocationFilter('${esc(opt.value)}')">${esc(opt.label)}</button>`).join('');
+}
+function setHandoverHistoryLocationFilter(location){
+  if(!isAdmin() && !location){return;}
+  handoverHistoryLocationFilter=location||'';
+  renderHandoverHistoryFilters();
+  loadHandoverHistory($('adminHandoverHistoryDate')?.value||todayLocalKey());
+}
+async function loadHandoverHistory(requestedDate){
+  const box=$('handoverHistory');if(!box)return;
+  renderHandoverHistoryFilters();
+  const admin=isAdmin();
+  const tools=$('adminHandoverHistoryTools');if(tools)tools.style.display=admin?'block':'none';
+  const picker=$('adminHandoverHistoryDate');
+  const today=todayLocalKey();
+  if(picker){picker.max=today;if(!picker.value)picker.value=today;}
+  // Non-admin users can only view today's history. ADMIN may choose a past date.
+  const date=(admin&&requestedDate&&/^\d{4}-\d{2}-\d{2}$/.test(requestedDate)&&requestedDate<=today)?requestedDate:today;
+  const title=$('handoverHistoryTitle');if(title)title.textContent=date===today?'Lịch sử nhận ca – bàn giao hôm nay':'Lịch sử nhận ca – bàn giao ngày '+date.split('-').reverse().join('/');
+  box.innerHTML='<div class="duty-empty">Đang tải lịch sử bàn giao…</div>';
+  try{
+    const r=await api(`${HANDOVER_TABLE}?roster_date=eq.${date}&select=id,roster_date,location,scheduled_time,handed_over_by,received_by,antt_status,antt_note,skdt_status,skdt_note,created_at&order=created_at.desc`);
+    const raw=await r.text();if(!r.ok)throw new Error(raw||('HTTP '+r.status));const allRows=raw?JSON.parse(raw):[];
+    const rows=Array.isArray(allRows)?allRows.filter(x=>!handoverHistoryLocationFilter||x.location===handoverHistoryLocationFilter||(handoverHistoryLocationFilter==='Y tế'&&x.location==='Phòng Y tế')||(handoverHistoryLocationFilter==='Phòng Y tế'&&x.location==='Y tế')):[];
+    if(!rows.length){const where=handoverHistoryLocationFilter?' tại '+handoverHistoryLocationFilter:'';box.innerHTML='<div class="duty-empty">Không có lượt nhận ca/bàn giao'+where+' trong ngày '+date.split('-').reverse().join('/')+'. Hãy chọn “Tất cả” hoặc một nhà/khu vực khác để xem.</div>';return;}
+    box.innerHTML='<div style="font-size:13px;color:#64748b;margin-bottom:8px">Đang hiển thị '+rows.length+' lượt'+(handoverHistoryLocationFilter?' tại '+esc(handoverHistoryLocationFilter):' ở tất cả nhà/khu vực')+'.</div><div class="duty-results">'+rows.map(x=>{const pending=x.received_by===HANDOVER_PENDING;const adminActions=admin?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="btn blue" onclick="editHandoverRecord(${Number(x.id)})">✏️ Sửa bàn giao</button><button type="button" class="btn red" onclick="deleteHandoverRecord(${Number(x.id)})">🗑️ Xóa bàn giao</button></div>`:'';return `<article class="duty-result"><b>${esc(x.location)} · ${esc(x.scheduled_time||'—')}</b><span><b>Bàn giao:</b> ${esc(x.handed_over_by||'—')}</span><span><b>Nhận ca:</b> ${pending?'<span style="color:#b45309;font-weight:700">CHỜ NHẬN CA</span>':esc(x.received_by||'—')}</span>${pending?`<button type="button" class="btn blue" style="margin-top:8px;width:100%" onclick="confirmHandoverReceipt(${Number(x.id)})">✍️ Tôi là người nhận ca – xác nhận</button>`:''}<span><b>ANTT:</b> ${esc(x.antt_status||'Ổn định')}${x.antt_note?' — '+esc(x.antt_note):''}</span><span><b>SKĐT:</b> ${esc(x.skdt_status||'Ổn định')}${x.skdt_note?' — '+esc(x.skdt_note):''}</span><small>Ngày: ${date.split('-').reverse().join('/')} · Ghi nhận: ${esc(x.created_at?new Date(x.created_at).toLocaleString('vi-VN'):'')}</small>${adminActions}</article>`}).join('')+'</div>';
+  }catch(err){console.error('Tải lịch sử bàn giao lỗi:',err);box.innerHTML='<div class="duty-empty">Chưa tải được lịch sử. Kiểm tra bảng daily_duty_handover_log và chính sách quyền trong Supabase. Chi tiết: '+esc(err?.message||String(err))+'</div>';}
+}
+async function editHandoverRecord(id){
+  if(!isAdmin()){alert('Chỉ ADMIN được sửa lịch sử bàn giao.');return;}
+  try{
+    const r=await api(`${HANDOVER_TABLE}?id=eq.${encodeURIComponent(id)}&select=id,roster_date,location,scheduled_time,handed_over_by,received_by,antt_status,antt_note,skdt_status,skdt_note&limit=1`);
+    const raw=await r.text();if(!r.ok)throw new Error(raw||('HTTP '+r.status));
+    const rows=raw?JSON.parse(raw):[];const x=Array.isArray(rows)?rows[0]:null;
+    if(!x){alert('Không tìm thấy lượt bàn giao này.');return;}
+    const location=prompt('Khu vực / Nhà:',x.location||'');if(location===null)return;
+    const scheduled_time=prompt('Giờ bàn giao (HH:MM):',x.scheduled_time||'');if(scheduled_time===null)return;
+    const handed_over_by=prompt('Họ tên người bàn giao:',x.handed_over_by||'');if(handed_over_by===null)return;
+    const received_by=prompt('Họ tên người nhận ca (để trống nếu vẫn chờ):',x.received_by===HANDOVER_PENDING?'':(x.received_by||''));if(received_by===null)return;
+    const antt_status=prompt('Tình trạng ANTT:',x.antt_status||'Ổn định');if(antt_status===null)return;
+    const antt_note=prompt('Ghi chú ANTT:',x.antt_note||'');if(antt_note===null)return;
+    const skdt_status=prompt('Tình trạng SKĐT:',x.skdt_status||'Ổn định');if(skdt_status===null)return;
+    const skdt_note=prompt('Ghi chú SKĐT:',x.skdt_note||'');if(skdt_note===null)return;
+    if(!location.trim()||!scheduled_time.trim()||!handed_over_by.trim()){alert('Khu vực, giờ bàn giao và người bàn giao không được để trống.');return;}
+    const payload={location:location.trim(),scheduled_time:scheduled_time.trim(),actual_time:scheduled_time.trim(),handed_over_by:handed_over_by.trim(),received_by:received_by.trim()||HANDOVER_PENDING,antt_status:antt_status.trim()||'Ổn định',antt_note:antt_note.trim(),skdt_status:skdt_status.trim()||'Ổn định',skdt_note:skdt_note.trim()};
+    const save=await api(`${HANDOVER_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'PATCH',headers:headers({'Prefer':'return=representation'}),body:JSON.stringify(payload)});
+    const saveText=await save.text();if(!save.ok)throw new Error(saveText||('HTTP '+save.status));
+    const updated=saveText?JSON.parse(saveText):[];if(!Array.isArray(updated)||!updated.length)throw new Error('Không có bản ghi nào được cập nhật. Kiểm tra quyền UPDATE/RLS trong Supabase.');
+    await loadHandoverHistory($('adminHandoverHistoryDate')?.value||x.roster_date||todayLocalKey());
+    alert('Đã cập nhật lượt bàn giao.');
+  }catch(err){console.error('Sửa bàn giao lỗi:',err);alert('Không sửa được lượt bàn giao. '+(err?.message||String(err))+'\nNếu lỗi liên quan RLS/permission, cần cấp quyền ADMIN ở Supabase.');}
+}
+async function deleteHandoverRecord(id){
+  if(!isAdmin()){alert('Chỉ ADMIN được xóa lịch sử bàn giao.');return;}
+  if(!confirm('Bạn chắc chắn muốn XÓA lượt bàn giao này? Thao tác này không thể hoàn tác.'))return;
+  try{
+    const r=await api(`${HANDOVER_TABLE}?id=eq.${encodeURIComponent(id)}`,{method:'DELETE',headers:headers({'Prefer':'return=representation'})});
+    const raw=await r.text();if(!r.ok)throw new Error(raw||('HTTP '+r.status));
+    const deleted=raw?JSON.parse(raw):[];if(Array.isArray(deleted)&&!deleted.length)throw new Error('Không xóa được bản ghi. Kiểm tra quyền DELETE/RLS trong Supabase.');
+    await loadHandoverHistory($('adminHandoverHistoryDate')?.value||todayLocalKey());
+    alert('Đã xóa lượt bàn giao.');
+  }catch(err){console.error('Xóa bàn giao lỗi:',err);alert('Không xóa được lượt bàn giao. '+(err?.message||String(err))+'\nNếu lỗi liên quan RLS/permission, cần cấp quyền ADMIN ở Supabase.');}
+}
+
+async function confirmHandoverReceipt(id){
+  const name=prompt('Người trực tiếp nhận ca: vui lòng nhập họ tên của mình để xác nhận.');
+  if(name===null)return;
+  const receiver=name.trim();
+  if(!receiver){alert('Bạn cần nhập họ tên người nhận ca.');return;}
+  if(!confirm('Xác nhận bạn đã trực tiếp nhận ca và tiếp nhận các nội dung bàn giao?'))return;
+  try{
+    // Xác nhận qua RPC SECURITY DEFINER để không cần mở quyền UPDATE công khai
+    // trên toàn bộ bảng daily_duty_handover_log.
+    const r=await api('rpc/confirm_handover_receipt',{method:'POST',headers:headers(),body:JSON.stringify({p_id:Number(id),p_receiver:receiver})});
+    const raw=await r.text();
+    if(!r.ok)throw new Error('RPC confirm_handover_receipt thất bại (HTTP '+r.status+'): '+(raw||'Không có chi tiết lỗi'));
+    const updated=raw?JSON.parse(raw):[];
+    if(!Array.isArray(updated)||!updated.length){
+      // RPC trả về 0 dòng khi lượt này không còn ở trạng thái chờ xác nhận
+      // hoặc ID không tồn tại; đọc lại để phân biệt với lỗi cập nhật.
+      const check=await api(`${HANDOVER_TABLE}?id=eq.${encodeURIComponent(id)}&select=id,roster_date,location,received_by&limit=1`);
+      const checkText=await check.text();
+      if(!check.ok)throw new Error('Supabase không cho phép đọc lại lượt bàn giao (HTTP '+check.status+'): '+checkText);
+      const checkRows=checkText?JSON.parse(checkText):[];
+      if(Array.isArray(checkRows)&&checkRows[0]&&checkRows[0].received_by!==HANDOVER_PENDING){
+        throw new Error('Lượt này đã được xác nhận bởi '+(checkRows[0].received_by||'người khác')+'. Hãy tải lại lịch sử để xem trạng thái mới.');
+      }
+      throw new Error('Hàm RPC không cập nhật dòng nào. Lượt bàn giao vẫn đang chờ xác nhận. Kiểm tra lại hàm public.confirm_handover_receipt và điều kiện received_by = '+HANDOVER_PENDING+'.');
+    }
+    const item=updated[0];
+    const rr=await api(`${DUTY_TABLE}?id=eq.1&select=id,roster_date,items,updated_at`);
+    const rraw=await rr.text();if(!rr.ok)throw new Error('Đã xác nhận nhận ca nhưng chưa cập nhật phân công hiện tại: '+rraw);
+    const rows=rraw?JSON.parse(rraw):[];const row=Array.isArray(rows)?rows[0]:null;
+    const date=item.roster_date||todayLocalKey();
+    const items=(row&&row.roster_date===date&&row.items&&typeof row.items==='object')?{...row.items}:{};
+    // Chuẩn hóa tên vị trí Y tế vì một số lượt bàn giao cũ có thể lưu là
+    // "Phòng Y tế" trong khi bảng phân công dùng khóa chuẩn "Y tế".
+    const dutyLocation=/^(y tế|phòng y tế|y te|phong y te)$/i.test(String(item.location||'').trim())
+      ? 'Y tế' : String(item.location||'').trim();
+    if(!dutyLocation)throw new Error('Lượt bàn giao chưa có vị trí Nhà/Y tế hợp lệ.');
+    items[dutyLocation]={...(items[dutyLocation]||{}),selected:true,name:receiver};
+    const ur=await api(`${DUTY_TABLE}?on_conflict=id`,{method:'POST',headers:headers({'Prefer':'resolution=merge-duplicates,return=minimal'}),body:JSON.stringify({id:1,roster_date:date,items,updated_at:new Date().toISOString()})});
+    const uraw=await ur.text();if(!ur.ok)throw new Error('Đã xác nhận nhưng chưa cập nhật cán bộ phụ trách: '+uraw);
+    // Đọc lại phân công từ Supabase sau khi lưu để tên người nhận ca được đồng bộ
+    // và hiển thị ngay tại đúng Nhà/Y tế trên giao diện hiện tại.
+    await loadDutyRosterFromCloud();
+    updateDutyHouseLabels();
+    await loadHandoverHistory();
+    alert('Đã xác nhận nhận ca. Tên người nhận đã được cập nhật vào phân công hôm nay và sẽ hiển thị tại '+dutyLocation+'.');
+  }catch(err){
+    console.error('Xác nhận nhận ca lỗi:',err);
+    alert('Chưa hoàn tất xác nhận nhận ca.\n\n'+(err?.message||String(err))+'\n\nNếu lỗi nhắc đến RLS/UPDATE, cần cấp quyền đúng trong Supabase; tải lại trang sau khi quản trị viên cập nhật quyền.');
+    // Tải lại trạng thái thực tế để tránh giao diện hiển thị dữ liệu cũ.
+    try{await loadHandoverHistory();await loadDutyRosterFromCloud();updateDutyHouseLabels();}catch(reloadErr){console.warn('Không thể tải lại sau lỗi nhận ca:',reloadErr);}
+  }
+}
+function dutyNameFor(location, roster=readDutyRoster()){
+  const item=roster.items?.[location];
+  return item?.selected && item.name ? String(item.name) : '';
+}
+function dutyHouseLabelHtml(location, roster=readDutyRoster()){
+  const name=dutyNameFor(location,roster);
+  return `<span class="duty-house-label ${name?'':'empty'}" data-duty-location="${esc(location)}">${name?'👤 Cán bộ hôm nay: '+esc(name):'Chưa cập nhật cán bộ hôm nay'}</span>`;
+}
+function updateDutyHouseLabels(){
+  const roster=readDutyRoster();
+  document.querySelectorAll('[data-duty-location]').forEach(el=>{
+    const location=el.getAttribute('data-duty-location')||'';
+    const name=dutyNameFor(location,roster);
+    el.classList.toggle('empty',!name);
+    el.textContent=name?'👤 Cán bộ hôm nay: '+name:'Chưa cập nhật cán bộ hôm nay';
+  });
+}
+window.addEventListener('focus',()=>{loadDutyRosterFromCloud();if($('dutyPanel')?.style.display!=='none')loadHandoverHistory();});
+window.addEventListener('pageshow',()=>{loadDutyRosterFromCloud();if($('dutyPanel')?.style.display!=='none')loadHandoverHistory();});
+
 const MEAL_STORAGE_KEY='btxh_meal_today_v1';
 function todayLocalKey(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function readMeal(){try{const item=JSON.parse(localStorage.getItem(MEAL_STORAGE_KEY)||'null');if(!item||item.date!==todayLocalKey()){if(item)localStorage.removeItem(MEAL_STORAGE_KEY);return null}return item}catch(e){return null}}
@@ -1208,12 +1723,25 @@ function openMealUpload(){openMealModal();$('mealUploadArea').style.display='blo
 function saveMealFile(){const file=$('mealFile').files[0];if(!file){alert('Vui lòng chọn file thực đơn.');return}if(file.size>4*1024*1024){alert('File lớn hơn 4 MB. Vui lòng chọn file nhỏ hơn để lưu trên trình duyệt.');return}const reader=new FileReader();reader.onload=()=>{try{const item={date:todayLocalKey(),name:file.name,type:file.type||'application/octet-stream',sizeLabel:(file.size/1024).toFixed(0)+' KB',uploadedAt:new Date().toLocaleString('vi-VN'),data:reader.result};localStorage.setItem(MEAL_STORAGE_KEY,JSON.stringify(item));$('mealFile').value='';renderMeal();openMealModal();alert('Đã cập nhật thực đơn hôm nay trên thiết bị này. Thông báo cập nhật đã hiển thị trên giao diện phần mềm. Lưu ý: thiết bị khác chưa nhận được thông báo nếu chưa dùng kho lưu trữ chung.')}catch(err){alert('Không lưu được file trên trình duyệt. Vui lòng chọn file nhỏ hơn.')}};reader.readAsDataURL(file)}
 function openMealFile(){const item=readMeal();if(!item)return;const a=document.createElement('a');a.href=item.data;a.download=item.name||'thuc_don_hom_nay';a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove()}
 window.onclick=e=>{if(e.target.classList.contains('modal'))e.target.classList.remove('show')}
-// Công khai các hàm quản lý tài khoản để nút onclick trong danh sách gọi được ổn định.
+// Công khai tường minh các hàm quản lý tài khoản để mọi nút onclick
+// trong danh sách vẫn gọi được sau khi HTML được triển khai trên GitHub Pages.
+window.openAdminAccountInfo = openAdminAccountInfo;
+window.createManagedAccount = createManagedAccount;
+window.loadManagedAccounts = loadManagedAccounts;
+window.editManagedAccount = editManagedAccount;
 window.resetManagedPassword = resetManagedPassword;
 window.toggleManagedAccount = toggleManagedAccount;
-window.loadManagedAccounts = loadManagedAccounts;
+window.toggleDutyName = toggleDutyName;
+window.setHandoverHistoryLocationFilter = setHandoverHistoryLocationFilter;
+window.saveDutyRoster = saveDutyRoster;
+window.resetDutyForm = resetDutyForm;
 
-toggleLoginHouse();restoreSession();renderMeal();loadPeople();
+// Báo rõ lỗi nếu trình duyệt không thể gọi được hàm từ nút tài khoản.
+window.addEventListener('error', function (event) {
+  if (event && event.message) console.error('Lỗi giao diện Theo dõi quân số:', event.message);
+});
+
+toggleLoginHouse();restoreSession();renderMeal();renderDutyPanel();loadDutyRosterFromCloud();loadPeople();
 </script>
 <script>if("serviceWorker" in navigator && location.protocol !== "file:"){navigator.serviceWorker.register("./sw.js").catch(()=>{});}</script>
 </body>
